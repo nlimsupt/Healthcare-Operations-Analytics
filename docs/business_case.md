@@ -119,7 +119,7 @@ The business intelligence and analytics team is responsible for preparing the da
 The project is organized into three analytical modules:
 
 1. **Inventory Decision Support**
-
+   
   - inventory availability
   - inventory value
   - demand variability
@@ -131,20 +131,20 @@ The project is organized into three analytical modules:
 
 2. **Supplier Risk Assessment**
 
-   - financial risk
-   - delivery and operational risk
-   - single-source exposure
-   - data-management risk
-   - regulatory and environmental risk
+  - financial risk
+  - delivery and operational risk
+  - single-source exposure
+  - data-management risk
+  - regulatory and environmental risk
 
 3. **Production Capacity Analysis**
 
-   - demand requirements
-   - process and cycle times
-   - production capacity
-   - rejection rates
-   - shutdown exposure
-   - potential bottlenecks
+  - demand requirements
+  - process and cycle times
+  - production capacity
+  - rejection rates
+  - shutdown exposure
+  - potential bottlenecks
 
 ---
 
@@ -164,15 +164,15 @@ All derived metrics, assumptions, and analytical limitations will be documented 
 
 The project will produce:
 
-- documented raw and processed datasets
+- documented raw and processed datasets;
 - a comprehensive data dictionary
-- reproducible data cleaning and feature engineering workflows
-- SQL scripts for data preparation and business analysis
-- Python notebooks for exploratory data analysis and scenario analysis
-- interactive Power BI dashboards for decision support
-- key analytical findings and business insights
-- prioritized business recommendations
-- complete documentation of the end-to-end analytics workflow
+- reproducible data cleaning and feature engineering workflows;
+- SQL scripts for data preparation and business analysis;
+- Python notebooks for exploratory data analysis and scenario analysis;
+- interactive Power BI dashboards for decision support;
+- key analytical findings and business insights;
+- prioritized business recommendations; and
+- complete documentation of the end-to-end analytics workflow.
 
 ---
 
