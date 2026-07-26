@@ -2,25 +2,31 @@
 
 ## Business Context
 
-This project uses a case-based dataset developed as part of the Harvard Global Health Delivery Project case, *Building the Supply Chain for COVID-19 Vaccines*.
+This project uses instructional operational data exhibits originally developed for the ASCM School Round 2020–21 Case Competition. The datasets simulate supplier, inventory, production, and manufacturing-capacity decisions across fictional healthcare manufacturing operations.
 
-The dataset represents the operational planning activities of a healthcare manufacturer responsible for managing inventory, supplier performance, and manufacturing capacity during a period of significant supply chain disruption.
+The portfolio analysis also draws on the Harvard Global Health Delivery Project case, *Building the Supply Chain for COVID-19 Vaccines*, as supplementary industry context for supply-chain disruption and healthcare manufacturing challenges.
+
+The datasets represent operational activities across the fictional organizations MediCrystals, GlasWork, and Fabricadas, covering supplier management, inventory planning, production planning, and manufacturing capacity.
 
 During periods of operational disruption, demand may increase unexpectedly, supplier performance may decline, lead times may become longer, and production capacity may be constrained. Without a structured analytics process, organizations may struggle to identify critical operational risks and prioritize effective responses.
 
-While the original case focuses on vaccine manufacturing during the COVID-19 pandemic, this project extends the analysis into a broader operational analytics framework applicable to healthcare manufacturing environments facing supplier disruptions, demand surges, material shortages, production interruptions, and other forms of operational uncertainty.
+While the Harvard case focuses on vaccine manufacturing during the COVID-19 pandemic, this project extends the analysis into a broader operational analytics framework applicable to healthcare manufacturing environments facing supplier disruptions, demand surges, material shortages, production interruptions, and other forms of operational uncertainty.
 
 ---
 
-## Data Source
+## Data Sources
 
-Harvard Global Health Delivery Project. *Building the Supply Chain for COVID-19 Vaccines* (GHD-045), 2021.
+This project is based on two complementary sources:
+
+1. Operational data exhibits originally developed for the ASCM School Round 2020–21 Case Competition. These instructional datasets cover supplier risk, inventory planning, production planning, and manufacturing capacity across fictional healthcare manufacturing operations.
+
+2. Harvard Global Health Delivery Project. *Building the Supply Chain for COVID-19 Vaccines* (GHD-045), 2021, used as supplementary industry context for vaccine manufacturing and supply-chain disruption.
 
 ---
 
 ## Business Problem
 
-The organization maintains operational data covering inventory, supplier risk, demand requirements, and production capacity. However, the data is distributed across separate datasets and does not provide management with a consolidated view of operational performance and risk.
+The case scenario provides operational data covering inventory, supplier risk, demand requirements, and production capacity. However, the data is distributed across separate datasets and does not provide decision-makers with a consolidated view of operational performance and risk.
 
 Decision-makers need a clearer way to:
 
@@ -150,11 +156,11 @@ The project is organized into three analytical modules:
 
 ## Data and Analytical Limitations
 
-The datasets represent separate operational views and do not provide a complete relational mapping across every area.
+The datasets are instructional operational datasets designed for educational analysis rather than production operational data. The datasets represent separate operational views and do not provide a complete relational mapping across every area.
 
 In particular, the available case data does not directly map individual suppliers to specific SKUs. Supplier and inventory risks will therefore be analyzed as separate modules and will not be presented as record-level causal relationships. This design choice reflects the structure of the available case data rather than an analytical assumption.
 
-The inventory data also represents a case-based operational snapshot with projected demand fields rather than a long historical transaction series. The project will therefore emphasize inventory planning and scenario analysis rather than claiming to perform a fully validated time-series forecast.
+The inventory data represents a case-based operational snapshot with monthly demand values rather than a long historical transaction series. The project will therefore emphasize inventory planning and scenario analysis rather than claiming to perform a fully validated time-series forecast.
 
 All derived metrics, assumptions, and analytical limitations will be documented clearly throughout the project.
 
@@ -164,9 +170,9 @@ All derived metrics, assumptions, and analytical limitations will be documented 
 
 The project will produce:
 
-- documented raw and processed datasets;
-- a comprehensive data dictionary
-- reproducible data cleaning and feature engineering workflows;
+- documented source and processed datasets;
+- a comprehensive data dictionary;
+- reproducible data validation, preparation, and feature engineering workflows;
 - SQL scripts for data preparation and business analysis;
 - Python notebooks for exploratory data analysis and scenario analysis;
 - interactive Power BI dashboards for decision support;
@@ -180,6 +186,6 @@ The project will produce:
 
 The proposed analytics solution is intended to help management move from fragmented reporting toward structured operational decision support.
 
-By identifying high-risk inventory, supplier concerns, and production constraints, the organization can better prioritize actions, reduce avoidable inventory exposure, prepare for disruption, and allocate operational resources more effectively.
+By identifying high-risk inventory, supplier concerns, and production constraints, decision-makers can better prioritize actions, reduce avoidable inventory exposure, prepare for disruption, and allocate operational resources more effectively.
 
-Although the source dataset originated from a pandemic-related case study, the analytical framework developed in this project is designed to be adaptable to a wide range of healthcare manufacturing and operational disruption scenarios.
+Although the instructional datasets and fictional business scenario originated from an educational case competition focused on pandemic-related supply chain challenges, the analytical framework developed in this project is designed to be adaptable to a wide range of healthcare manufacturing and operational disruption scenarios.
