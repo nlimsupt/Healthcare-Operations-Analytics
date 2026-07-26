@@ -30,13 +30,13 @@ The project begins by identifying the operational challenges faced by healthcare
 
 ## 2. Data Understanding
 
-The available datasets are reviewed to understand their structure, business context, and relationships. Each dataset is examined to identify its granularity, variables, and role within the overall operational workflow.
+The available datasets are reviewed to understand their structure, business context, and relationships. Each analytical module is examined to understand its granularity, variables, and role within the overall operational workflow.
 
 ---
 
 ## 3. Data Preparation
 
-The datasets are prepared for analysis by validating data quality and ensuring consistency across variables. Missing values are verified using the COUNTBLANK() function in Excel, while duplicate records are checked using Excel's Remove Duplicates feature. No missing values or duplicate records are identified. Data types and variable consistency are also reviewed before the datasets are prepared for downstream analysis in Python and SQL.
+The datasets are prepared for analysis by validating data quality and ensuring consistency across variables. Missing values are verified using the COUNTBLANK() function in Excel, while duplicate records are checked using Excel's Remove Duplicates feature. No missing values or duplicate records are identified. Data types and variable consistency are reviewed before the source data is imported into MySQL and prepared for downstream analysis in Python.
 
 ---
 
@@ -44,7 +44,7 @@ The datasets are prepared for analysis by validating data quality and ensuring c
 
 Additional analytical variables are created to support inventory planning and operational analysis. These derived variables are calculated using inventory management formulas introduced during the course and are not part of the original case dataset.
 
-Examples include:
+Examples of derived variables include:
 
 - Daily Demand
 - Demand During Lead Time
@@ -74,7 +74,7 @@ Interactive dashboards are developed to present key operational metrics and busi
 
 ## 8. Predictive Analytics
 
-Predictive models are developed to estimate future operational outcomes and support proactive decision-making. Depending on the business scenario, predictive analysis may include demand forecasting, inventory optimization, or operational risk prediction.
+Predictive techniques may be applied, where appropriate, to estimate future operational outcomes and support proactive decision-making. Depending on the business scenario, the analysis may include demand forecasting, inventory optimization, or operational risk prediction.
 
 ---
 
@@ -95,6 +95,6 @@ The final stage translates analytical findings into practical business recommend
 | Exploratory Data Analysis (EDA) | Identify patterns, trends, and potential operational issues | Python (Pandas, Matplotlib), Descriptive statistics |
 | SQL Analysis | Retrieve, aggregate, and summarize operational data | MySQL |
 | Dashboard Development | Visualize key operational KPIs and business insights | Power BI |
-| Predictive Analytics | Develop predictive models to support operational decision-making | Python (Scikit-learn) |
+| Predictive Analytics | Apply predictive techniques where appropriate to support operational decision-making | Python (Scikit-learn) |
 | Business Recommendations | Translate analytical findings into actionable recommendations | Business analysis, Data storytelling |
 | Documentation | Document project assumptions, datasets, methodology, and analytical decisions | Markdown, GitHub |
