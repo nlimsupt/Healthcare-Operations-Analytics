@@ -2,26 +2,26 @@
 
 ## Dataset Overview
 
-This project uses four operational datasets derived from the Harvard Global Health Delivery Project case, *Building the Supply Chain for COVID-19 Vaccines*.
+This project uses seven instructional operational tables organized into four analytical modules: supplier risk, inventory planning, production planning, and manufacturing capacity. The source data exhibits were developed for the ASCM School Round 2020–21 Case Competition.
 
-Each dataset represents a different aspect of healthcare manufacturing operations, including supplier risk, inventory planning, production planning, and manufacturing capacity. Rather than forming a fully normalized relational database, the datasets provide complementary operational perspectives that are analyzed independently when direct relationships are unavailable.
+The datasets simulate operational activities across fictional organizations, including MediCrystals, GlasWork, and Fabricadas. Each module represents a different aspect of healthcare manufacturing operations. Rather than forming a fully normalized relational database, the tables provide complementary operational perspectives that are analyzed independently when direct relationships are unavailable.
 
 ---
 
-## Dataset Summary
+## Analytical Module Summary
 
-| Dataset | Purpose | Granularity | Approx. Records |
-|---------|----------|-------------|----------------:|
+| Analytical Module | Purpose | Granularity | Approx. Records |
+|-------------------|---------|-------------|----------------:|
 | Supplier Risk | Assess supplier performance and operational risk | One record per supplier | 12 suppliers |
 | Inventory Planning | Monitor inventory and calculate replenishment metrics | One record per SKU | ~2,000 SKUs |
-| Production Planning | Estimate production requirements and cycle times | One record per product | 3 products |
+| Production Planning | Estimate production requirements and cycle times | One record per product in each source table | 3 products across 4 tables |
 | Manufacturing Capacity | Evaluate plant availability and production constraints | One record per production unit | 14 production units |
 
 ---
 
-## Supplier Risk Dataset
+## Supplier Risk Module
 
-### Dataset Metadata
+### Module Metadata
 
 | Property | Value |
 |----------|-------|
@@ -49,16 +49,16 @@ Each dataset represents a different aspect of healthcare manufacturing operation
 
 ---
 
-## Inventory Planning Dataset
+## Inventory Planning Module
 
-### Dataset Metadata
+### Module Metadata
 
 | Property | Value |
 |----------|-------|
 | Purpose | Inventory planning and replenishment analysis |
 | Granularity | One record per SKU |
 | Primary Key | SKU |
-| Derived Variables | Yes |
+| Derived Variables | Yes (not included in the source data) |
 | Related Module | Inventory Decision Support |
 
 #### Original Variables
@@ -70,7 +70,7 @@ Each dataset represents a different aspect of healthcare manufacturing operation
 | On-Hand Stock | Numeric | Currency | Current on-hand inventory value | Available inventory value |
 | Inventory in Units On-Hand | Integer | Units | Current inventory quantity | Physical inventory |
 | APU | Integer | Units per month | Average monthly demand | Demand planning |
-| Monthly Demand | Numeric | Units | Monthly demand (October–September) | Monthly demand analysis |
+| October–September Demand | Numeric | Units per month | Twelve monthly demand fields covering the October–September planning period | Monthly demand profile |
 | Demand for the Year | Numeric | Units per year | Total demand across the October–September planning period | Annual demand |
 | APU Trend | Decimal | Percentage | Expected demand trend | Demand growth |
 | S-OTD | Decimal | Ratio | Supplier delivery performance | Procurement reliability |
@@ -91,33 +91,74 @@ Each dataset represents a different aspect of healthcare manufacturing operation
 
 ---
 
-## Production Planning Dataset
+## Production Planning Module
 
-### Dataset Metadata
+### Module Metadata
 
 | Property | Value |
 |----------|-------|
-| Purpose | Estimate production requirements and process utilization |
-| Granularity | One record per product |
-| Primary Key | Product |
+| Purpose | Estimate production requirements, process utilization, and quality performance |
+| Source Tables | 4 |
+| Common Key | Product |
+| Granularity | One record per product in each source table |
 | Derived Variables | No |
 | Related Module | Production Capacity Analysis |
 
-#### Variables
+### Source Tables
+
+The Production Planning module consists of four operational tables:
+
+| Table | Purpose |
+|-------|---------|
+| Demand Projections | Project production demand by product and quarter |
+| Product Cycle Time | Measure total production cycle time |
+| Process Cycle Time | Measure cycle time for each manufacturing process |
+| Product Rejects | Measure reject rates by defect category |
+
+### Variables by Source Table
+
+#### Demand Projections
 
 | Column | Type | Unit / Format | Description | Business Meaning |
 |---------|------|---------------|-------------|------------------|
 | Product | Text | — | Product category | Manufactured product |
-| Quarterly Demand | Numeric | Units | Projected production demand | Production planning |
-| Cycle Time | Numeric | Hours | Total production time | Capacity planning |
-| Process Cycle Time | Numeric | Hours | Time required for each manufacturing stage | Bottleneck analysis |
-| Reject Rate | Decimal | Percentage | Average production rejects | Quality performance |
+| Q3 2020 Actual | Numeric | Units | Actual product demand for Q3 2020 | Historical demand baseline |
+| Q4 2020 Projections | Numeric | Units | Projected product demand for Q4 2020 | Near-term production planning |
+| Q1 2021 Projections | Numeric | Units | Projected product demand for Q1 2021 | Future production planning |
+| Q2 2021 Projections | Numeric | Units | Projected product demand for Q2 2021 | Future production planning |
+
+#### Product Cycle Time
+
+| Column | Type | Unit / Format | Description | Business Meaning |
+|---------|------|---------------|-------------|------------------|
+| Product | Text | — | Product category | Manufactured product |
+| Cycle Time | Numeric | Hours | Total cycle time required for the product | Overall capacity requirement |
+
+#### Process Cycle Time
+
+| Column | Type | Unit / Format | Description | Business Meaning |
+|---------|------|---------------|-------------|------------------|
+| Product | Text | — | Product category | Manufactured product |
+| Tubing | Numeric | Hours per process | Time required for the tubing process | Process-capacity and bottleneck analysis |
+| Hot-forming | Numeric | Hours per process | Time required for the hot-forming process | Process-capacity and bottleneck analysis |
+| Washing | Numeric | Hours per process | Time required for the washing process | Process-capacity and bottleneck analysis |
+| Packing | Numeric | Hours per process | Time required for the packing process | Process-capacity and bottleneck analysis |
+
+#### Product Rejects
+
+| Column | Type | Unit / Format | Description | Business Meaning |
+|---------|------|---------------|-------------|------------------|
+| Product | Text | — | Product category | Manufactured product |
+| Bend Tubing Rejects | Decimal | Percentage | Reject rate associated with bend-tubing defects | Monitor tubing-related quality losses |
+| Contamination Rejects | Decimal | Percentage | Reject rate associated with contamination | Monitor contamination-related quality losses |
+| Glass Breakages | Decimal | Percentage | Reject rate associated with glass breakage | Monitor material and handling quality losses |
+| Air Bubbles | Decimal | Percentage | Reject rate associated with air-bubble defects | Monitor forming-related quality losses |
 
 ---
 
-## Manufacturing Capacity Dataset
+## Manufacturing Capacity Module
 
-### Dataset Metadata
+### Module Metadata
 
 | Property | Value |
 |----------|-------|
@@ -138,18 +179,19 @@ Each dataset represents a different aspect of healthcare manufacturing operation
 
 ---
 
-## Dataset Relationships
+## Module Relationships
 
-The project datasets represent complementary operational perspectives rather than a fully normalized relational database.
-- The Supplier Risk dataset is analyzed independently because supplier records are not directly linked to individual SKUs.
-- The Inventory Planning dataset contains SKU-level operational data and derived inventory planning metrics.
-- The Production Planning and Manufacturing Capacity datasets are analyzed together to evaluate production feasibility and capacity constraints.
+The project modules represent complementary operational perspectives rather than a fully normalized relational database.
+
+- The Supplier Risk module is analyzed independently because supplier records are not directly linked to individual SKUs.
+- The Inventory Planning module contains SKU-level operational data and derived inventory planning metrics.
+- The Production Planning and Manufacturing Capacity modules are analyzed together to evaluate production feasibility and capacity constraints.
 
 ---
 
 ## Data Quality Notes
 
-- Supplier and inventory datasets are not directly related through a common key.
+- Supplier and inventory modules are not directly related through a common key.
 - Several inventory planning metrics are derived from the original operational variables.
-- Production planning data is based on projected demand rather than historical production transactions.
-- The datasets represent a case-based operational scenario rather than a live enterprise information system.
+- Production planning data primarily contains projected demand, supplemented by a single quarter of actual demand, rather than a long history of production transactions.
+- The modules represent an instructional operational scenario rather than a live enterprise information system.
