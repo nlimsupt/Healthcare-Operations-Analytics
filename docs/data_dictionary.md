@@ -4,7 +4,7 @@
 
 This project uses seven instructional operational tables organized into four analytical modules: supplier risk, inventory planning, production planning, and manufacturing capacity. The source data exhibits were developed for the ASCM School Round 2020–21 Case Competition.
 
-The datasets simulate operational activities across fictional organizations, including MediCrystals, GlasWork, and Fabricadas. Each module represents a different aspect of healthcare manufacturing operations. Rather than forming a fully normalized relational database, the tables provide complementary operational perspectives that are analyzed independently when direct relationships are unavailable.
+The datasets simulate operational activities within MediCrystals' supply chain, including supplier risk management at the company level, inventory planning at GlasWork Plant, and production and capacity planning at Fabricadas Plant. Each module represents a different aspect of healthcare manufacturing operations. Rather than forming a fully normalized relational database, the tables provide complementary operational perspectives that are analyzed independently when direct relationships are unavailable.
 
 ---
 
@@ -29,7 +29,7 @@ The datasets simulate operational activities across fictional organizations, inc
 | Granularity | One record per supplier |
 | Primary Key | Supplier Name |
 | Derived Variables | No |
-| Related Module | Supplier Risk Assessment |
+| Operational Scope | MediCrystals Supplier Network |
 
 #### Variables
 
@@ -59,7 +59,7 @@ The datasets simulate operational activities across fictional organizations, inc
 | Granularity | One record per SKU |
 | Primary Key | SKU |
 | Derived Variables | Yes (not included in the source data) |
-| Related Module | Inventory Decision Support |
+| Operational Scope | GlasWork Plant |
 
 #### Original Variables
 
@@ -102,7 +102,7 @@ The datasets simulate operational activities across fictional organizations, inc
 | Common Key | Product |
 | Granularity | One record per product in each source table |
 | Derived Variables | No |
-| Related Module | Production Capacity Analysis |
+| Operational Scope | Fabricadas Plant |
 
 ### Source Tables
 
@@ -166,7 +166,7 @@ The Production Planning module consists of four operational tables:
 | Granularity | One record per production unit |
 | Primary Key | Production Unit |
 | Derived Variables | No |
-| Related Module | Production Capacity Analysis |
+| Operational Scope | Fabricadas Plant |
 
 #### Variables
 
@@ -185,7 +185,7 @@ The project modules represent complementary operational perspectives rather than
 
 - The Supplier Risk module is analyzed independently because supplier records are not directly linked to individual SKUs.
 - The Inventory Planning module contains SKU-level operational data and derived inventory planning metrics.
-- The Production Planning and Manufacturing Capacity modules are analyzed together to evaluate production feasibility and capacity constraints.
+- The Production Planning and Manufacturing Capacity modules are analyzed together to evaluate production feasibility and capacity constraints at Fabricadas Plant.
 
 ---
 
