@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project follows an end-to-end analytics workflow to transform operational data into actionable business insights for healthcare manufacturing operations. The methodology covers the complete analytics process, from understanding the business problem to developing data-driven recommendations.
+This project follows an end-to-end analytics workflow to transform fragmented operational data into actionable business insights for MediCrystals, Co. The methodology covers supplier risk at the company level, inventory planning at GlasWork Plant, and production and manufacturing-capacity analysis at Fabricadas Plant.
 
 ---
 
@@ -13,18 +13,19 @@ The project consists of the following stages:
 1. Business Understanding
 2. Data Understanding
 3. Data Preparation
-4. Feature Engineering
-5. Exploratory Data Analysis (EDA)
-6. SQL Analysis
-7. Dashboard Development
-8. Predictive Analytics
-9. Business Recommendations
+4. Database Design and Data Loading
+5. Data Validation
+6. Feature Engineering
+7. SQL Analysis
+8. Exploratory and Scenario Analysis
+9. Dashboard Development
+10. Business Recommendations
 
 ---
 
 ## 1. Business Understanding
 
-The project begins by identifying the operational challenges faced by healthcare manufacturers, including supplier risks, inventory planning, production efficiency, and manufacturing capacity. The business objectives are defined to ensure that the analysis addresses practical operational decision-making.
+The project begins by identifying the operational challenges represented in the MediCrystals case, including supplier risk at the company level, inventory planning at GlasWork Plant, and production and manufacturing-capacity constraints at Fabricadas Plant. Business objectives and analytical questions are defined to ensure that the analysis supports practical operational decision-making across the company and plant levels.
 
 ---
 
@@ -36,51 +37,73 @@ The available datasets are reviewed to understand their structure, business cont
 
 ## 3. Data Preparation
 
-The datasets are prepared for analysis by validating data quality and ensuring consistency across variables. Missing values are verified using the COUNTBLANK() function in Excel, while duplicate records are checked using Excel's Remove Duplicates feature. No missing values or duplicate records are identified. Data types and variable consistency are reviewed before the source data is imported into MySQL and prepared for downstream analysis in Python.
+The source exhibits are reviewed and reorganized into seven analysis-ready tables. Formula-based Excel fields are converted to stored values before CSV export, column structures are standardized, and identifier fields such as SKU are preserved as text.
+
+Missing values and duplicate records are initially checked in Excel. Data types, units, percentages, ratios, and categorical values are reviewed before the source tables are imported into MySQL for formal validation and analysis.
 
 ---
 
-## 4. Feature Engineering
+## 4. Database Design and Data Loading
 
-Additional analytical variables are created to support inventory planning and operational analysis. These derived variables are calculated using inventory management formulas introduced during the course and are not part of the original case dataset.
+A MySQL database is designed to organize the seven source tables according to their operational granularity and analytical purpose. Table names and column names are standardized using consistent naming conventions, and appropriate data types and primary keys are defined before loading the prepared CSV files.
 
-Examples of derived variables include:
+The database preserves the limitations of the source data. Relationships are created only where supported by valid common keys, and no supplier-to-SKU or product-to-production-unit relationship is assumed when such mappings are unavailable.
 
+---
+
+## 5. Data Validation
+
+After loading the source tables into MySQL, validation queries are used to confirm row counts, primary-key uniqueness, missing values, duplicate records, valid ranges, categorical values, and consistency between source files and database tables.
+
+Additional checks are performed for inventory quantities, demand values, percentages, supplier-performance ratios, cycle times, rejection rates, and shutdown days before analytical calculations are performed.
+
+---
+
+## 6. Feature Engineering
+
+Additional analytical variables are created to support inventory planning and operational analysis. The calculation logic is documented and implemented through reproducible SQL and Python workflows, depending on the analytical requirement.
+
+The derived inventory variables are based on inventory-management formulas introduced in the original coursework and are not part of the source datasets.
+
+Examples include:
+
+- Obsolete Inventory
+- Normalized COV
 - Daily Demand
 - Demand During Lead Time
+- Standard Deviation During Lead Time
 - Safety Stock
 - Reorder Point
-- Obsolete Inventory
 
 ---
 
-## 5. Exploratory Data Analysis (EDA)
+## 7. SQL Analysis
 
-Exploratory analysis is conducted to understand operational patterns, identify potential risks, and summarize key characteristics of the data. Summary statistics and visualizations are used to examine supplier performance, inventory levels, production efficiency, and manufacturing capacity.
+SQL is used to retrieve, aggregate, validate, and summarize operational data. Analytical queries are developed to assess supplier risk across the MediCrystals supplier network, inventory status at GlasWork Plant, and production and capacity conditions at Fabricadas Plant.
 
----
-
-## 6. SQL Analysis
-
-SQL is used to retrieve, aggregate, and summarize operational data through analytical queries. Queries are developed to support inventory monitoring, supplier evaluation, production reporting, and operational performance measurement.
+Because the source exhibits do not provide complete relational mappings across all modules, tables are joined only where a supported common key exists.
 
 ---
 
-## 7. Dashboard Development
+## 8. Exploratory and Scenario Analysis
 
-Interactive dashboards are developed to present key operational metrics and business insights. The dashboards are designed to provide decision-makers with an integrated view of supplier performance, inventory status, production operations, and manufacturing capacity.
+Python is used to conduct deeper exploratory analysis and evaluate operational scenarios. The analysis examines patterns in supplier performance, inventory exposure, production requirements, quality losses, downtime, and capacity availability.
 
----
-
-## 8. Predictive Analytics
-
-Predictive techniques may be applied, where appropriate, to estimate future operational outcomes and support proactive decision-making. Depending on the business scenario, the analysis may include demand forecasting, inventory optimization, or operational risk prediction.
+Scenario analysis is used to evaluate how changes in assumptions such as demand, lead time, service level, supplier performance, or available capacity may affect inventory and operational requirements. These scenarios are intended to support sensitivity analysis and decision-making rather than validated predictive forecasting.
 
 ---
 
-## 9. Business Recommendations
+## 9. Dashboard Development
 
-The final stage translates analytical findings into practical business recommendations. Insights from descriptive analysis, SQL reporting, dashboards, and predictive analytics are combined to support operational improvements and strategic decision-making.
+Interactive Power BI dashboards are developed to communicate operational KPIs and analytical findings. The dashboard structure includes an executive overview for MediCrystals, supplier-risk analysis, GlasWork inventory decision support, and Fabricadas production and capacity analysis.
+
+The dashboards are designed to support prioritization and decision-making without implying unsupported record-level relationships between operational modules.
+
+---
+
+## 10. Business Recommendations
+
+The final stage translates analytical findings into practical business recommendations. Insights from SQL analysis, exploratory analysis, scenario analysis, and dashboards are combined to support operational improvements and management decision-making.
 
 ---
 
@@ -88,13 +111,14 @@ The final stage translates analytical findings into practical business recommend
 
 | Project Component | Objective | Primary Tools / Techniques |
 |---------------|-----------|----------------------------|
-| Business Understanding | Define the business problem, project objectives, and expected outcomes | Business analysis |
-| Data Understanding | Review dataset structure, variables, and business context | Excel, Business domain knowledge |
-| Data Preparation | Validate data quality, organize datasets, and prepare data for analysis | Excel, Data validation |
-| Feature Engineering | Create analytical variables to support inventory planning and operational analysis | Python (Pandas), Inventory management formulas |
-| Exploratory Data Analysis (EDA) | Identify patterns, trends, and potential operational issues | Python (Pandas, Matplotlib), Descriptive statistics |
-| SQL Analysis | Retrieve, aggregate, and summarize operational data | MySQL |
-| Dashboard Development | Visualize key operational KPIs and business insights | Power BI |
-| Predictive Analytics | Apply predictive techniques where appropriate to support operational decision-making | Python (Scikit-learn) |
-| Business Recommendations | Translate analytical findings into actionable recommendations | Business analysis, Data storytelling |
-| Documentation | Document project assumptions, datasets, methodology, and analytical decisions | Markdown, GitHub |
+| Business Understanding | Define business problems, operational scopes, objectives, and analytical questions | Business analysis |
+| Data Understanding | Review source-table structures, granularity, variables, and relationships | Excel, business domain knowledge |
+| Data Preparation | Standardize source tables and prepare analysis-ready CSV files | Excel, data cleaning |
+| Database Design and Loading | Define schemas, keys, data types, and load seven source tables | MySQL |
+| Data Validation | Verify completeness, uniqueness, ranges, formats, and source-to-database consistency | SQL, Excel |
+| Feature Engineering | Create documented inventory and operational metrics | SQL, Python, inventory-management formulas |
+| SQL Analysis | Retrieve, aggregate, and summarize operational performance and risk | MySQL |
+| Exploratory and Scenario Analysis | Examine patterns and test operational assumptions | Python, Pandas, Matplotlib, descriptive statistics |
+| Dashboard Development | Present management KPIs and operational insights | Power BI |
+| Business Recommendations | Translate findings into prioritized operational actions | Business analysis, data storytelling |
+| Documentation | Record assumptions, datasets, calculations, limitations, and analytical decisions | Markdown, GitHub |
