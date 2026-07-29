@@ -1,13 +1,13 @@
 supplier_name,location,revenue,cash_from_operations ,credit_rating,s_otd,single_source,ip_protection,data_security,labor_unrests,environmental_incidents
-Plaxian,US,6040,354,3,0.91,Y,N,9,Y,N
-GutesGlas,Germany,8293,905,3,0.85,N,N,8,N,N
-Boavidro,Brazil,9287,364,3,0.63,N,N,8,N,N
-Saanch,India,3147,436,2,0.9,N,N,9,N,N
-RealGlass,China,37719,3996,1,0.82,Y,Y,10,Y,Y
-Optikiet,China,113,23,4,0.88,Y,Y,7,N,N
-BestOGlass,US,5379,24,2,0.78,Y,N,10,N,N
-MedicMetric,Philippines,10,10,4,0.94,Y,Y,7,N,N
-Shale,Saudi Arabia,2431,309,3,0.86,N,N,8,N,Y
-Opticful,Italy,95,6,3,0.92,N,N,5,N,N
-basicPharm,US,395,9M,5,0.88,Y,Y,7,N,N
-PharmyLeaf,India,1431,340,2,0.79,N,N,8,N,N
+Plaxian,US,6040,354,3,0.91,1,0,9,1,0
+GutesGlas,Germany,8293,905,3,0.85,0,0,8,0,0
+Boavidro,Brazil,9287,364,3,0.63,0,0,8,0,0
+Saanch,India,3147,436,2,0.9,0,0,9,0,0
+RealGlass,China,37719,3996,1,0.82,1,1,10,1,1
+Optikiet,China,113,23,4,0.88,1,1,7,0,0
+BestOGlass,US,5379,24,2,0.78,1,0,10,0,0
+MedicMetric,Philippines,10,10,4,0.94,1,1,7,0,0
+Shale,Saudi Arabia,2431,309,3,0.86,0,0,8,0,1
+Opticful,Italy,95,6,3,0.92,0,0,5,0,0
+basicPharm,US,395,9,5,0.88,1,1,7,0,0
+PharmyLeaf,India,1431,340,2,0.79,0,0,8,0,0

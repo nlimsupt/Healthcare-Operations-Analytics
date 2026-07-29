@@ -1,4 +1,5 @@
-﻿sku ,standard_price,on_hand_stock_value,inventory_units_on_hand,average_monthly_usage,october_demand,november_demand,december_demand,january_demand,february_demand,march_demand,april_demand,may_demand,june_demand,july_demand,august_demand,september_demand,annual_demand,average_monthly_usage_trend,supplier_on_time_delivery,demand_variability_cov,lead_time_days
+﻿SKU ,Std. Price ($),On-Hand Stock ($),Inventory in units on-hand,"APU
+(units)",Oct,Nov,Dec,Jan,Feb,Mar,Apr,May,June,July,August,September,Demand for the whole year,APU Trend,S-OTD,Demand variability (COV),Lead Time (days)
 14172, 34 ,5837.312718, 173 ,122,109.8,109.8,109.8,109.8,109.8,109.8,109.8,109.8,109.8,109.8,109.8,109.8,1317.6,-0.10,0.77,1.56,23
 52169, 12 ,1532.719476, 127 ,178,213.6,213.6,213.6,213.6,213.6,213.6,213.6,213.6,213.6,213.6,213.6,213.6,2563.2,0.20,0.85,1.8,12
 72156, 12 ,4562.334137, 388 ,324,194.4,194.4,194.4,194.4,194.4,194.4,194.4,194.4,194.4,194.4,194.4,194.4,2332.8,-0.40,0.77,1.38,21
