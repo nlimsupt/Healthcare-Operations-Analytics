@@ -1,0 +1,3 @@
+CREATE DATABASE healthcare_operations_analytics;
+
+USE healthcare_operations_analytics;
