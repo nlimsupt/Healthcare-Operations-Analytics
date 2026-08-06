@@ -1,0 +1,3 @@
+demand_trend_category,sku_count,percentage_of_skus,total_annual_demand,total_inventory_value
+"Declining Demand",674,33.53,7617160.80,10443795.13
+"Growing Demand",1336,66.47,70930010.40,35564404.77

@@ -1,0 +1,4 @@
+inventory_status,sku_count,percentage_of_skus,total_inventory_value
+"Below Reorder Point",1564,77.81,40880005.30
+"Near Reorder Point",108,5.37,1077755.21
+"Above Reorder Point",338,16.82,4050439.39
