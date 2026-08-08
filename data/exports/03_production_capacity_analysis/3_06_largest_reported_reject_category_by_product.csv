@@ -1,0 +1,4 @@
+product,bend_tubing_reject_rate,contamination_reject_rate,glass_breakage_reject_rate,air_bubble_reject_rate,highest_reject_rate,highest_reject_category
+Vials,2.800000,6.000000,3.200000,3.000000,6.000000,Contamination
+Ampoules,1.000000,5.700000,3.500000,2.800000,5.700000,Contamination
+Syringes,3.400000,5.200000,2.800000,2.600000,5.200000,Contamination

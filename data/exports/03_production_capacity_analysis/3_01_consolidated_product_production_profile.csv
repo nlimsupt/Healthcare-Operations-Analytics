@@ -1,0 +1,4 @@
+product,q3_2020_actual,q4_2020_projection,q1_2021_projection,q2_2021_projection,cycle_time_hours,tubing_hours,hot_forming_hours,washing_hours,packing_hours,bend_tubing_reject_rate,contamination_reject_rate,glass_breakage_reject_rate,air_bubble_reject_rate
+Ampoules,15.00,55.00,60.00,65.00,60.0000,6.0000,12.0000,18.0000,24.0000,1.000000,5.700000,3.500000,2.800000
+Syringes,10.00,35.00,40.00,45.00,57.0000,6.0000,9.0000,18.0000,24.0000,3.400000,5.200000,2.800000,2.600000
+Vials,5.00,20.00,30.00,35.00,63.0000,9.0000,9.0000,21.0000,24.0000,2.800000,6.000000,3.200000,3.000000

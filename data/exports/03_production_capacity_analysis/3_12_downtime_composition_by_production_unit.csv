@@ -1,0 +1,15 @@
+production_unit,total_non_operating_days,weekends_holidays_percentage,planned_shutdown_percentage,unplanned_shutdown_percentage
+"Forming #2",150,76.67,6.67,16.67
+"Packing #3",150,76.67,6.67,16.67
+"Packing #1",145,79.31,6.90,13.79
+"Packing #2",145,79.31,6.90,13.79
+"Packing #5",145,79.31,6.90,13.79
+"Packing #6",145,79.31,6.90,13.79
+"Tubing #2",145,79.31,6.90,13.79
+"Washing #2",145,79.31,6.90,13.79
+"Washing #3",145,79.31,6.90,13.79
+"Forming #1",140,82.14,7.14,10.71
+"Packing #4",140,82.14,7.14,10.71
+"Tubing #1",140,82.14,7.14,10.71
+"Washing #1",140,82.14,7.14,10.71
+"Washing #4",140,82.14,7.14,10.71
