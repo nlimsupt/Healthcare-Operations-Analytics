@@ -1,0 +1,13 @@
+supplier_name,location,revenue,cash_from_operations,credit_rating,credit_rating_risk_score,s_otd,delivery_shortfall_score,single_source,ip_protection,data_security,single_source_risk_indicator,no_ip_protection_risk_indicator,data_security_gap_score,data_management_binary_risk_count,labor_unrests,environmental_incidents,regulatory_risk_indicator_count
+RealGlass,China,37719.00,3996.00,1,100.00,0.82,18.00,1,1,10,1,0,0.00,1,1,1,2
+BestOGlass,US,5379.00,24.00,2,80.00,0.78,22.00,1,0,10,1,1,0.00,2,0,0,0
+PharmyLeaf,India,1431.00,340.00,2,80.00,0.79,21.00,0,0,8,0,1,20.00,1,0,0,0
+Saanch,India,3147.00,436.00,2,80.00,0.90,10.00,0,0,9,0,1,10.00,1,0,0,0
+Boavidro,Brazil,9287.00,364.00,3,60.00,0.63,37.00,0,0,8,0,1,20.00,1,0,0,0
+GutesGlas,Germany,8293.00,905.00,3,60.00,0.85,15.00,0,0,8,0,1,20.00,1,0,0,0
+Shale,"Saudi Arabia",2431.00,309.00,3,60.00,0.86,14.00,0,0,8,0,1,20.00,1,0,1,1
+Plaxian,US,6040.00,354.00,3,60.00,0.91,9.00,1,0,9,1,1,10.00,2,1,0,1
+Opticful,Italy,95.00,6.00,3,60.00,0.92,8.00,0,0,5,0,1,50.00,1,0,0,0
+Optikiet,China,113.00,23.00,4,40.00,0.88,12.00,1,1,7,1,0,30.00,1,0,0,0
+MedicMetric,Philippines,10.00,10.00,4,40.00,0.94,6.00,1,1,7,1,0,30.00,1,0,0,0
+basicPharm,US,395.00,9.00,5,20.00,0.88,12.00,1,1,7,1,0,30.00,1,0,0,0

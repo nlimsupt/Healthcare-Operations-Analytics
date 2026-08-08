@@ -1,0 +1,13 @@
+supplier_name,location,revenue,cash_from_operations,operating_cash_flow_margin,credit_rating
+BestOGlass,US,5379.00,24.00,0.0045,2
+basicPharm,US,395.00,9.00,0.0228,5
+Boavidro,Brazil,9287.00,364.00,0.0392,3
+Plaxian,US,6040.00,354.00,0.0586,3
+Opticful,Italy,95.00,6.00,0.0632,3
+RealGlass,China,37719.00,3996.00,0.1059,1
+GutesGlas,Germany,8293.00,905.00,0.1091,3
+Shale,"Saudi Arabia",2431.00,309.00,0.1271,3
+Saanch,India,3147.00,436.00,0.1385,2
+Optikiet,China,113.00,23.00,0.2035,4
+PharmyLeaf,India,1431.00,340.00,0.2376,2
+MedicMetric,Philippines,10.00,10.00,1.0000,4

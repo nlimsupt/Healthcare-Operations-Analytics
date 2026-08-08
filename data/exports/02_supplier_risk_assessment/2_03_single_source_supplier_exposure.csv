@@ -1,0 +1,7 @@
+supplier_name,location,s_otd,single_source,ip_protection,data_security
+BestOGlass,US,0.78,1,0,10
+RealGlass,China,0.82,1,1,10
+basicPharm,US,0.88,1,1,7
+Optikiet,China,0.88,1,1,7
+Plaxian,US,0.91,1,0,9
+MedicMetric,Philippines,0.94,1,1,7
