@@ -13,34 +13,22 @@ USE healthcare_operations_analytics;
 
 SELECT 'supplier_risk' AS table_name, COUNT(*) AS total_rows
 FROM supplier_risk
-
 UNION ALL
-
 SELECT 'inventory_planning', COUNT(*)
 FROM inventory_planning
-
 UNION ALL
-
 SELECT 'demand_projections', COUNT(*)
 FROM demand_projections
-
 UNION ALL
-
 SELECT 'product_cycle_time', COUNT(*)
 FROM product_cycle_time
-
 UNION ALL
-
 SELECT 'process_cycle_time', COUNT(*)
 FROM process_cycle_time
-
 UNION ALL
-
 SELECT 'product_rejects', COUNT(*)
 FROM product_rejects
-
 UNION ALL
-
 SELECT 'manufacturing_capacity', COUNT(*)
 FROM manufacturing_capacity;
 
@@ -165,7 +153,6 @@ SELECT
     SUM(on_hand_stock_value IS NULL) AS on_hand_stock_value_nulls,
     SUM(inventory_units_on_hand IS NULL) AS inventory_units_nulls,
     SUM(average_monthly_usage IS NULL) AS average_monthly_usage_nulls,
-
     SUM(october_demand IS NULL) AS october_nulls,
     SUM(november_demand IS NULL) AS november_nulls,
     SUM(december_demand IS NULL) AS december_nulls,
@@ -178,7 +165,6 @@ SELECT
     SUM(july_demand IS NULL) AS july_nulls,
     SUM(august_demand IS NULL) AS august_nulls,
     SUM(september_demand IS NULL) AS september_nulls,
-
     SUM(annual_demand IS NULL) AS annual_demand_nulls,
     SUM(average_monthly_usage_trend IS NULL) AS trend_nulls,
     SUM(supplier_on_time_delivery IS NULL) AS supplier_otd_nulls,
@@ -464,19 +450,13 @@ SELECT
 FROM (
     SELECT product, 'demand_projections' AS source_table
     FROM demand_projections
-
     UNION ALL
-
     SELECT product, 'product_cycle_time'
     FROM product_cycle_time
-
     UNION ALL
-
     SELECT product, 'process_cycle_time'
     FROM process_cycle_time
-
     UNION ALL
-
     SELECT product, 'product_rejects'
     FROM product_rejects
 ) AS product_sources
@@ -493,54 +473,42 @@ SELECT
     COUNT(DISTINCT supplier_name) AS unique_primary_keys,
     SUM(supplier_name IS NULL) AS null_primary_keys
 FROM supplier_risk
-
 UNION ALL
-
 SELECT
     'inventory_planning',
     COUNT(*),
     COUNT(DISTINCT sku),
     SUM(sku IS NULL)
 FROM inventory_planning
-
 UNION ALL
-
 SELECT
     'demand_projections',
     COUNT(*),
     COUNT(DISTINCT product),
     SUM(product IS NULL)
 FROM demand_projections
-
 UNION ALL
-
 SELECT
     'product_cycle_time',
     COUNT(*),
     COUNT(DISTINCT product),
     SUM(product IS NULL)
 FROM product_cycle_time
-
 UNION ALL
-
 SELECT
     'process_cycle_time',
     COUNT(*),
     COUNT(DISTINCT product),
     SUM(product IS NULL)
 FROM process_cycle_time
-
 UNION ALL
-
 SELECT
     'product_rejects',
     COUNT(*),
     COUNT(DISTINCT product),
     SUM(product IS NULL)
 FROM product_rejects
-
 UNION ALL
-
 SELECT
     'manufacturing_capacity',
     COUNT(*),

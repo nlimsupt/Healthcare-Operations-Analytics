@@ -26,11 +26,13 @@ SELECT
     SUM(inventory_units_on_hand) AS total_inventory_units,
     ROUND(SUM(annual_demand), 2) AS total_annual_demand,
     ROUND(AVG(standard_price), 2) AS average_standard_price,
+    MIN(lead_time_days) AS minimum_lead_time_days,
+    MAX(lead_time_days) AS maximum_lead_time_days,
     ROUND(AVG(lead_time_days), 2) AS average_lead_time_days,
-    ROUND(AVG(supplier_on_time_delivery), 4)
-        AS average_supplier_on_time_delivery,
-    ROUND(AVG(demand_variability_cov), 4)
-        AS average_demand_variability_cov
+    MIN(supplier_on_time_delivery) AS minimum_supplier_otd,
+    MAX(supplier_on_time_delivery) AS maximum_supplier_otd,
+    ROUND(AVG(supplier_on_time_delivery), 4) AS average_supplier_otd,
+    ROUND(AVG(demand_variability_cov), 4) AS average_demand_variability_cov
 FROM inventory_features;
 
 -- ------------------------------------------------------------
@@ -41,10 +43,7 @@ SELECT
     sku,
     inventory_units_on_hand,
     ROUND(reorder_point, 2) AS reorder_point,
-    ROUND(
-        reorder_point - inventory_units_on_hand,
-        2
-    ) AS units_below_reorder_point,
+    ROUND(reorder_point - inventory_units_on_hand, 2) AS units_below_reorder_point,
     ROUND(daily_demand, 2) AS daily_demand,
     lead_time_days,
     ROUND(safety_stock, 2) AS safety_stock,
@@ -59,14 +58,8 @@ ORDER BY units_below_reorder_point DESC;
 
 SELECT
     COUNT(*) AS total_skus,
-    SUM(inventory_units_on_hand < reorder_point)
-        AS skus_below_reorder_point,
-    ROUND(
-        100.0
-        * SUM(inventory_units_on_hand < reorder_point)
-        / COUNT(*),
-        2
-    ) AS percentage_below_reorder_point
+    SUM(inventory_units_on_hand < reorder_point) AS skus_below_reorder_point,
+    ROUND(100.0 * SUM(inventory_units_on_hand < reorder_point) / COUNT(*), 2) AS percentage_below_reorder_point
 FROM inventory_features;
 
 -- ------------------------------------------------------------
@@ -91,12 +84,8 @@ SELECT
         ELSE 'Above Reorder Point'
     END AS inventory_status,
     COUNT(*) AS sku_count,
-    ROUND(
-        100.0 * COUNT(*) / SUM(COUNT(*)) OVER (),
-        2
-    ) AS percentage_of_skus,
-    ROUND(SUM(on_hand_stock_value), 2)
-        AS total_inventory_value
+    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS percentage_of_skus,
+    ROUND(SUM(on_hand_stock_value), 2) AS total_inventory_value
 FROM inventory_features
 GROUP BY inventory_status
 ORDER BY
@@ -115,11 +104,7 @@ SELECT
     standard_price,
     inventory_units_on_hand,
     ROUND(on_hand_stock_value, 2) AS on_hand_stock_value,
-    ROUND(
-        100.0 * on_hand_stock_value
-        / SUM(on_hand_stock_value) OVER (),
-        4
-    ) AS percentage_of_total_inventory_value
+    ROUND(100.0 * on_hand_stock_value / SUM(on_hand_stock_value) OVER (), 4) AS percentage_of_total_inventory_value
 FROM inventory_features
 ORDER BY on_hand_stock_value DESC
 LIMIT 20;
@@ -133,30 +118,82 @@ WITH inventory_value_ranking AS (
     SELECT
         sku,
         on_hand_stock_value,
-        SUM(on_hand_stock_value) OVER (
-            ORDER BY on_hand_stock_value DESC
-            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-        ) AS cumulative_inventory_value,
-        SUM(on_hand_stock_value) OVER ()
-            AS total_inventory_value
+        SUM(on_hand_stock_value) OVER (ORDER BY on_hand_stock_value DESC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative_inventory_value,
+        SUM(on_hand_stock_value) OVER () AS total_inventory_value
     FROM inventory_features
 )
+
 SELECT
     sku,
     ROUND(on_hand_stock_value, 2) AS on_hand_stock_value,
-    ROUND(
-        100.0 * on_hand_stock_value / total_inventory_value,
-        4
-    ) AS percentage_of_total_value,
-    ROUND(
-        100.0 * cumulative_inventory_value / total_inventory_value,
-        2
-    ) AS cumulative_percentage_of_value
+    ROUND(100.0 * on_hand_stock_value / total_inventory_value, 4) AS percentage_of_total_value,
+    ROUND(100.0 * cumulative_inventory_value / total_inventory_value, 2) AS cumulative_percentage_of_value
 FROM inventory_value_ranking
 ORDER BY on_hand_stock_value DESC;
 
 -- ------------------------------------------------------------
--- 1.7 Inventory coverage in months
+-- 1.7 ABC Inventory Classification
+--
+-- This analysis applies an illustrative ABC inventory
+-- classification based on cumulative on-hand inventory value.
+--
+-- Classification thresholds:
+--   A = First ~80% of cumulative inventory value
+--   B = Next ~15% (up to ~95%)
+--   C = Remaining ~5%
+--
+-- The SKU that crosses each cumulative threshold is included
+-- in the preceding class.
+--
+-- These thresholds are applied for analytical purposes and
+-- are not provided by the source dataset.
+-- ------------------------------------------------------------
+
+WITH inventory_value_ranking AS (
+    SELECT
+        sku,
+        on_hand_stock_value,
+        SUM(on_hand_stock_value) OVER (ORDER BY on_hand_stock_value DESC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative_inventory_value,
+        SUM(on_hand_stock_value) OVER () AS total_inventory_value
+    FROM inventory_features
+),
+
+abc_classification AS (
+    SELECT
+        sku,
+        on_hand_stock_value,
+        (100.0 * on_hand_stock_value / total_inventory_value) AS percentage_of_total_value,
+        (100.0 * cumulative_inventory_value / total_inventory_value) AS cumulative_percentage_of_value,
+        (100.0 * (cumulative_inventory_value - on_hand_stock_value) / total_inventory_value) AS cumulative_percentage_before_current,
+        CASE
+            WHEN
+                (100.0 * (cumulative_inventory_value - on_hand_stock_value) / total_inventory_value) < 80
+                THEN 'A'
+            WHEN
+                (100.0 * (cumulative_inventory_value - on_hand_stock_value) / total_inventory_value) < 95
+                THEN 'B'
+            ELSE 'C'
+        END AS abc_class
+    FROM inventory_value_ranking
+)
+
+SELECT
+    abc_class,
+    COUNT(*) AS sku_count,
+    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS percentage_of_skus,
+    ROUND(SUM(on_hand_stock_value), 2) AS total_inventory_value,
+    ROUND(100.0 * SUM(on_hand_stock_value) / SUM(SUM(on_hand_stock_value)) OVER (), 2) AS percentage_of_inventory_value
+FROM abc_classification
+GROUP BY abc_class
+ORDER BY
+    CASE abc_class
+        WHEN 'A' THEN 1
+        WHEN 'B' THEN 2
+        WHEN 'C' THEN 3
+    END;
+
+-- ------------------------------------------------------------
+-- 1.8 Inventory coverage in months
 -- ------------------------------------------------------------
 
 SELECT
@@ -174,7 +211,7 @@ FROM inventory_features
 ORDER BY months_of_inventory_coverage DESC;
 
 -- ------------------------------------------------------------
--- 1.8 SKUs with less than one month of inventory coverage
+-- 1.9 SKUs with less than one month of inventory coverage
 -- ------------------------------------------------------------
 
 SELECT
@@ -197,7 +234,7 @@ WHERE
 ORDER BY months_of_inventory_coverage ASC;
 
 -- ------------------------------------------------------------
--- 1.9 Potential excess inventory
+-- 1.10 Potential excess inventory
 --
 -- This query treats inventory exceeding annual demand as
 -- potential excess inventory for screening purposes.
@@ -222,7 +259,7 @@ WHERE inventory_units_on_hand > annual_demand
 ORDER BY potential_excess_value DESC;
 
 -- ------------------------------------------------------------
--- 1.10 Highest safety-stock requirements
+-- 1.11 Highest safety-stock requirements
 -- ------------------------------------------------------------
 
 SELECT
@@ -241,7 +278,7 @@ ORDER BY safety_stock DESC
 LIMIT 20;
 
 -- ------------------------------------------------------------
--- 1.11 Relationship between variability, lead time,
+-- 1.12 Relationship between variability, lead time,
 -- and safety stock
 -- ------------------------------------------------------------
 
@@ -259,7 +296,7 @@ ORDER BY
 LIMIT 25;
 
 -- ------------------------------------------------------------
--- 1.12 Demand-trend distribution
+-- 1.13 Demand-trend distribution
 -- ------------------------------------------------------------
 
 SELECT
@@ -283,7 +320,7 @@ FROM inventory_features
 GROUP BY demand_trend_category;
 
 -- ------------------------------------------------------------
--- 1.13 Priority inventory exceptions
+-- 1.14 Priority inventory exceptions
 --
 -- Combines reorder-point exposure, low supplier delivery
 -- performance, and high demand variability.
