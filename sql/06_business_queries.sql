@@ -162,15 +162,15 @@ abc_classification AS (
     SELECT
         sku,
         on_hand_stock_value,
-        (100.0 * on_hand_stock_value / total_inventory_value) AS percentage_of_total_value,
-        (100.0 * cumulative_inventory_value / total_inventory_value) AS cumulative_percentage_of_value,
-        (100.0 * (cumulative_inventory_value - on_hand_stock_value) / total_inventory_value) AS cumulative_percentage_before_current,
+        100.0 * on_hand_stock_value / total_inventory_value AS percentage_of_total_value,
+        100.0 * cumulative_inventory_value / total_inventory_value AS cumulative_percentage_of_value,
+        100.0 * (cumulative_inventory_value - on_hand_stock_value) / total_inventory_value AS cumulative_percentage_before_current,
         CASE
             WHEN
-                (100.0 * (cumulative_inventory_value - on_hand_stock_value) / total_inventory_value) < 80
+                100.0 * (cumulative_inventory_value - on_hand_stock_value) / total_inventory_value < 80
                 THEN 'A'
             WHEN
-                (100.0 * (cumulative_inventory_value - on_hand_stock_value) / total_inventory_value) < 95
+                100.0 * (cumulative_inventory_value - on_hand_stock_value) / total_inventory_value < 95
                 THEN 'B'
             ELSE 'C'
         END AS abc_class
@@ -180,7 +180,7 @@ abc_classification AS (
 SELECT
     abc_class,
     COUNT(*) AS sku_count,
-    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS percentage_of_skus,
+    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS percentage_of_total_skus,
     ROUND(SUM(on_hand_stock_value), 2) AS total_inventory_value,
     ROUND(100.0 * SUM(on_hand_stock_value) / SUM(SUM(on_hand_stock_value)) OVER (), 2) AS percentage_of_inventory_value
 FROM abc_classification
@@ -200,11 +200,7 @@ SELECT
     sku,
     inventory_units_on_hand,
     average_monthly_usage,
-    ROUND(
-        inventory_units_on_hand
-        / NULLIF(average_monthly_usage, 0),
-        2
-    ) AS months_of_inventory_coverage,
+    ROUND(inventory_units_on_hand / NULLIF(average_monthly_usage, 0), 2) AS months_of_inventory_coverage,
     ROUND(on_hand_stock_value, 2) AS on_hand_stock_value,
     ROUND(annual_demand, 2) AS annual_demand
 FROM inventory_features
@@ -218,19 +214,13 @@ SELECT
     sku,
     inventory_units_on_hand,
     average_monthly_usage,
-    ROUND(
-        inventory_units_on_hand
-        / NULLIF(average_monthly_usage, 0),
-        2
-    ) AS months_of_inventory_coverage,
+    ROUND(inventory_units_on_hand / NULLIF(average_monthly_usage, 0), 2) AS months_of_inventory_coverage,
     ROUND(reorder_point, 2) AS reorder_point,
     lead_time_days,
     ROUND(on_hand_stock_value, 2) AS on_hand_stock_value
-
 FROM inventory_features
 WHERE
-    inventory_units_on_hand
-    / NULLIF(average_monthly_usage, 0) < 1
+    inventory_units_on_hand / NULLIF(average_monthly_usage, 0) < 1
 ORDER BY months_of_inventory_coverage ASC;
 
 -- ------------------------------------------------------------
@@ -244,16 +234,9 @@ SELECT
     sku,
     inventory_units_on_hand,
     ROUND(annual_demand, 2) AS annual_demand,
-    ROUND(
-        inventory_units_on_hand - annual_demand,
-        2
-    ) AS potential_excess_units,
+    ROUND(inventory_units_on_hand - annual_demand, 2) AS potential_excess_units,
     standard_price,
-    ROUND(
-        (inventory_units_on_hand - annual_demand)
-        * standard_price,
-        2
-    ) AS potential_excess_value
+    ROUND((inventory_units_on_hand - annual_demand) * standard_price, 2) AS potential_excess_value
 FROM inventory_features
 WHERE inventory_units_on_hand > annual_demand
 ORDER BY potential_excess_value DESC;
@@ -266,10 +249,8 @@ SELECT
     sku,
     ROUND(safety_stock, 2) AS safety_stock,
     ROUND(reorder_point, 2) AS reorder_point,
-    ROUND(demand_during_lead_time, 2)
-        AS demand_during_lead_time,
-    ROUND(demand_variability_cov, 4)
-        AS demand_variability_cov,
+    ROUND(demand_during_lead_time, 2) AS demand_during_lead_time,
+    ROUND(demand_variability_cov, 4) AS demand_variability_cov,
     ROUND(normalized_cov, 4) AS normalized_cov,
     lead_time_days,
     supplier_on_time_delivery
@@ -308,14 +289,9 @@ SELECT
         ELSE 'Growing Demand'
     END AS demand_trend_category,
     COUNT(*) AS sku_count,
-    ROUND(
-        100.0 * COUNT(*) / SUM(COUNT(*)) OVER (),
-        2
-    ) AS percentage_of_skus,
-    ROUND(SUM(annual_demand), 2)
-        AS total_annual_demand,
-    ROUND(SUM(on_hand_stock_value), 2)
-        AS total_inventory_value
+    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS percentage_of_skus,
+    ROUND(SUM(annual_demand), 2) AS total_annual_demand,
+    ROUND(SUM(on_hand_stock_value), 2) AS total_inventory_value
 FROM inventory_features
 GROUP BY demand_trend_category;
 
@@ -333,19 +309,17 @@ SELECT
     sku,
     inventory_units_on_hand,
     ROUND(reorder_point, 2) AS reorder_point,
-    ROUND(reorder_point - inventory_units_on_hand, 2)
-        AS reorder_shortfall,
+    ROUND(reorder_point - inventory_units_on_hand, 2) AS reorder_shortfall,
     supplier_on_time_delivery,
     demand_variability_cov,
     lead_time_days,
     ROUND(safety_stock, 2) AS safety_stock,
     ROUND(on_hand_stock_value, 2) AS on_hand_stock_value
 FROM inventory_features
-WHERE inventory_units_on_hand < reorder_point
-  AND supplier_on_time_delivery < 0.80
-ORDER BY
-    reorder_shortfall DESC,
-    demand_variability_cov DESC;
+WHERE inventory_units_on_hand < reorder_point AND supplier_on_time_delivery < 0.80
+ORDER BY 
+	reorder_shortfall DESC,
+	demand_variability_cov DESC;
 
 -- ============================================================
 -- 2. SUPPLIER RISK ASSESSMENT — MEDICRYSTALS
@@ -358,16 +332,14 @@ ORDER BY
 SELECT
     COUNT(*) AS total_suppliers,
     ROUND(AVG(revenue), 2) AS average_revenue_million_usd,
-    ROUND(AVG(cash_from_operations), 2)
-        AS average_cash_from_operations_million_usd,
+    ROUND(AVG(cash_from_operations), 2) AS average_cash_from_operations_million_usd,
     ROUND(AVG(credit_rating), 2) AS average_credit_rating,
     ROUND(AVG(s_otd), 4) AS average_supplier_otd,
     ROUND(AVG(data_security), 2) AS average_data_security_score,
     SUM(single_source = 1) AS single_source_suppliers,
     SUM(ip_protection = 0) AS suppliers_without_ip_protection,
     SUM(labor_unrests = 1) AS suppliers_with_labor_unrests,
-    SUM(environmental_incidents = 1)
-        AS suppliers_with_environmental_incidents
+    SUM(environmental_incidents = 1) AS suppliers_with_environmental_incidents
 FROM supplier_risk;
 
 -- ------------------------------------------------------------
@@ -383,7 +355,9 @@ SELECT
     labor_unrests,
     environmental_incidents
 FROM supplier_risk
-ORDER BY s_otd ASC, single_source DESC;
+ORDER BY 
+	s_otd ASC, 
+	single_source DESC;
 
 -- ------------------------------------------------------------
 -- 2.3 Single-source supplier exposure
@@ -418,13 +392,11 @@ SELECT
     data_security,
     ip_protection
 FROM supplier_risk
-WHERE labor_unrests = 1
-   OR environmental_incidents = 1
-   OR ip_protection = 0
-ORDER BY
-    environmental_incidents DESC,
-    labor_unrests DESC,
-    single_source DESC;
+WHERE labor_unrests = 1 OR environmental_incidents = 1 OR ip_protection = 0
+ORDER BY 
+	environmental_incidents DESC, 
+	labor_unrests DESC, 
+	single_source DESC;
 
 -- ------------------------------------------------------------
 -- 2.5 Transparent supplier risk-indicator count
@@ -448,15 +420,10 @@ SELECT
     ip_protection,
     labor_unrests,
     environmental_incidents,
-    (
-        single_source
-        + (ip_protection = 0)
-        + labor_unrests
-        + environmental_incidents
-    ) AS binary_risk_indicator_count
+    single_source + (ip_protection = 0) + labor_unrests + environmental_incidents AS binary_risk_indicator_count
 FROM supplier_risk
-ORDER BY
-    binary_risk_indicator_count DESC,
+ORDER BY 
+	binary_risk_indicator_count DESC, 
     s_otd ASC;
 
 -- ------------------------------------------------------------
@@ -468,10 +435,7 @@ SELECT
     location,
     revenue,
     cash_from_operations,
-    ROUND(
-        cash_from_operations / NULLIF(revenue, 0),
-        4
-    ) AS operating_cash_flow_margin,
+    ROUND(cash_from_operations / NULLIF(revenue, 0), 4) AS operating_cash_flow_margin,
     credit_rating,
     s_otd
 FROM supplier_risk
@@ -507,10 +471,7 @@ SELECT
     credit_rating,
     -- Credit rating ranges from 1 to 5.
     -- Lower credit rating = higher financial risk.
-    ROUND(
-        (6 - credit_rating) / 5.0 * 100,
-        2
-    ) AS credit_rating_risk_score,
+    ROUND((6 - credit_rating) / 5.0 * 100, 2) AS credit_rating_risk_score,
     -- ========================================================
     -- Operations Risk
     -- ========================================================
@@ -518,10 +479,7 @@ SELECT
     -- S-OTD is stored as a ratio from 0 to 1.
     -- The score represents the percentage delivery shortfall.
     -- Example: S-OTD = 0.82 produces an 18% shortfall score.
-    ROUND(
-        (1 - s_otd) * 100,
-        2
-    ) AS delivery_shortfall_score,
+    ROUND((1 - s_otd) * 100, 2) AS delivery_shortfall_score,
     -- ========================================================
     -- Data Management Risk
     -- ========================================================
@@ -538,18 +496,13 @@ SELECT
     END AS no_ip_protection_risk_indicator,
     -- Data-security score ranges from 0 to 10.
     -- Lower data-security score = higher risk.
-    ROUND(
-        (10 - data_security) / 10.0 * 100,
-        2
-    ) AS data_security_gap_score,
+    ROUND((10 - data_security) / 10.0 * 100, 2) AS data_security_gap_score,
     -- Count of binary data-management risk indicators.
-    (
-        single_source
-        + CASE
-            WHEN ip_protection = 0 THEN 1
-            ELSE 0
-          END
-    ) AS data_management_binary_risk_count,
+    (single_source 
+	    + CASE 
+			WHEN ip_protection = 0 THEN 1 
+            ELSE 0 
+		END) AS data_management_binary_risk_count,
     -- ========================================================
     -- Regulatory Risk
     -- ========================================================
@@ -559,10 +512,7 @@ SELECT
     -- 0 = no indicators present
     -- 1 = one indicator present
     -- 2 = both indicators present
-    (
-        labor_unrests
-        + environmental_incidents
-    ) AS regulatory_risk_indicator_count
+    (labor_unrests + environmental_incidents) AS regulatory_risk_indicator_count
 FROM supplier_risk
 ORDER BY
     credit_rating_risk_score DESC,
@@ -620,30 +570,10 @@ SELECT
     q4_2020_projection,
     q1_2021_projection,
     q2_2021_projection,
-    ROUND(
-        100.0
-        * (q4_2020_projection - q3_2020_actual)
-        / NULLIF(q3_2020_actual, 0),
-        2
-    ) AS q4_vs_q3_growth_percentage,
-    ROUND(
-        100.0
-        * (q1_2021_projection - q4_2020_projection)
-        / NULLIF(q4_2020_projection, 0),
-        2
-    ) AS q1_vs_q4_growth_percentage,
-    ROUND(
-        100.0
-        * (q2_2021_projection - q1_2021_projection)
-        / NULLIF(q1_2021_projection, 0),
-        2
-    ) AS q2_vs_q1_growth_percentage,
-    ROUND(
-        100.0
-        * (q2_2021_projection - q3_2020_actual)
-        / NULLIF(q3_2020_actual, 0),
-        2
-    ) AS q2_vs_q3_growth_percentage
+    ROUND(100.0 * (q4_2020_projection - q3_2020_actual) / NULLIF(q3_2020_actual, 0), 2) AS q4_vs_q3_growth_percentage,
+    ROUND(100.0 * (q1_2021_projection - q4_2020_projection) / NULLIF(q4_2020_projection, 0), 2) AS q1_vs_q4_growth_percentage,
+    ROUND(100.0 * (q2_2021_projection - q1_2021_projection) / NULLIF(q1_2021_projection, 0), 2) AS q2_vs_q1_growth_percentage,
+    ROUND(100.0 * (q2_2021_projection - q3_2020_actual) / NULLIF(q3_2020_actual, 0), 2) AS q2_vs_q3_growth_percentage
 FROM demand_projections
 ORDER BY q2_vs_q3_growth_percentage DESC;
 
@@ -713,22 +643,8 @@ ORDER BY longest_process_time_hours DESC;
 SELECT
     pct.product,
     pct.cycle_time_hours AS reported_cycle_time_hours,
-    (
-        prct.tubing_hours
-        + prct.hot_forming_hours
-        + prct.washing_hours
-        + prct.packing_hours
-    ) AS summed_process_cycle_time_hours,
-    ROUND(
-        pct.cycle_time_hours
-        - (
-            prct.tubing_hours
-            + prct.hot_forming_hours
-            + prct.washing_hours
-            + prct.packing_hours
-        ),
-        4
-    ) AS cycle_time_difference_hours
+    prct.tubing_hours + prct.hot_forming_hours + prct.washing_hours + prct.packing_hours AS summed_process_cycle_time_hours,
+    ROUND(pct.cycle_time_hours - (prct.tubing_hours + prct.hot_forming_hours + prct.washing_hours + prct.packing_hours), 4) AS cycle_time_difference_hours
 FROM product_cycle_time AS pct
 INNER JOIN process_cycle_time AS prct
     ON pct.product = prct.product
@@ -792,25 +708,10 @@ ORDER BY highest_reject_rate DESC;
 
 SELECT
     product,
-    ROUND(
-        bend_tubing_reject_rate
-        + contamination_reject_rate
-        + glass_breakage_reject_rate
-        + air_bubble_reject_rate,
-        4
-    ) AS summed_reported_defect_rates,
-    ROUND(
-        (
-            bend_tubing_reject_rate
-            + contamination_reject_rate
-            + glass_breakage_reject_rate
-            + air_bubble_reject_rate
-        ) / 4,
-        4
-    ) AS average_reported_defect_rate
+    ROUND(bend_tubing_reject_rate + contamination_reject_rate + glass_breakage_reject_rate + air_bubble_reject_rate, 4) AS summed_reported_defect_rates,
+    ROUND((bend_tubing_reject_rate + contamination_reject_rate + glass_breakage_reject_rate + air_bubble_reject_rate) / 4, 4) AS average_reported_defect_rate
 FROM product_rejects
-ORDER BY
-    summed_reported_defect_rates DESC;
+ORDER BY summed_reported_defect_rates DESC;
 
 -- ------------------------------------------------------------
 -- 3.8 Approximate cycle-time requirement for Q2 demand
@@ -824,11 +725,7 @@ SELECT
     dp.product,
     dp.q2_2021_projection,
     pct.cycle_time_hours,
-    ROUND(
-        dp.q2_2021_projection
-        * pct.cycle_time_hours,
-        2
-    ) AS projected_q2_cycle_time_requirement
+    ROUND(dp.q2_2021_projection * pct.cycle_time_hours, 2) AS projected_q2_cycle_time_requirement
 FROM demand_projections AS dp
 INNER JOIN product_cycle_time AS pct
     ON dp.product = pct.product
@@ -850,11 +747,7 @@ SELECT
         AS total_planned_shutdown_days,
     SUM(unplanned_shutdown_days)
         AS total_unplanned_shutdown_days,
-    SUM(
-        weekends_holidays_days
-        + planned_shutdown_days
-        + unplanned_shutdown_days
-    ) AS total_non_operating_days
+    SUM(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days) AS total_non_operating_days
 FROM manufacturing_capacity;
 
 -- ------------------------------------------------------------
@@ -866,11 +759,7 @@ SELECT
     weekends_holidays_days,
     planned_shutdown_days,
     unplanned_shutdown_days,
-    (
-        weekends_holidays_days
-        + planned_shutdown_days
-        + unplanned_shutdown_days
-    ) AS total_non_operating_days
+    weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days AS total_non_operating_days
 FROM manufacturing_capacity
 ORDER BY
     total_non_operating_days DESC,
@@ -889,16 +778,7 @@ SELECT
     unplanned_shutdown_days,
     planned_shutdown_days,
     weekends_holidays_days,
-    ROUND(
-        100.0 * unplanned_shutdown_days
-        / NULLIF(
-            weekends_holidays_days
-            + planned_shutdown_days
-            + unplanned_shutdown_days,
-            0
-        ),
-        2
-    ) AS unplanned_share_of_non_operating_days
+    ROUND(100.0 * unplanned_shutdown_days / NULLIF(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days, 0), 2) AS unplanned_share_of_non_operating_days
 FROM manufacturing_capacity
 ORDER BY
     unplanned_shutdown_days DESC,
@@ -910,41 +790,10 @@ ORDER BY
 
 SELECT
     production_unit,
-    (
-        weekends_holidays_days
-        + planned_shutdown_days
-        + unplanned_shutdown_days
-    ) AS total_non_operating_days,
-    ROUND(
-        100.0 * weekends_holidays_days
-        / NULLIF(
-            weekends_holidays_days
-            + planned_shutdown_days
-            + unplanned_shutdown_days,
-            0
-        ),
-        2
-    ) AS weekends_holidays_percentage,
-    ROUND(
-        100.0 * planned_shutdown_days
-        / NULLIF(
-            weekends_holidays_days
-            + planned_shutdown_days
-            + unplanned_shutdown_days,
-            0
-        ),
-        2
-    ) AS planned_shutdown_percentage,
-    ROUND(
-        100.0 * unplanned_shutdown_days
-        / NULLIF(
-            weekends_holidays_days
-            + planned_shutdown_days
-            + unplanned_shutdown_days,
-            0
-        ),
-        2
-    ) AS unplanned_shutdown_percentage
+    weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days AS total_non_operating_days,
+    ROUND(100.0 * weekends_holidays_days / NULLIF(weekends_holidays_days+ planned_shutdown_days + unplanned_shutdown_days, 0), 2) AS weekends_holidays_percentage,
+    ROUND(100.0 * planned_shutdown_days / NULLIF(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days, 0), 2) AS planned_shutdown_percentage,
+    ROUND(100.0 * unplanned_shutdown_days / NULLIF(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days, 0), 2) AS unplanned_shutdown_percentage
 FROM manufacturing_capacity
 ORDER BY total_non_operating_days DESC;
 
@@ -961,39 +810,27 @@ WITH unit_downtime AS (
         weekends_holidays_days,
         planned_shutdown_days,
         unplanned_shutdown_days,
-        (
-            weekends_holidays_days
-            + planned_shutdown_days
-            + unplanned_shutdown_days
-        ) AS total_non_operating_days
+        weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days AS total_non_operating_days
     FROM manufacturing_capacity
 ),
+
 downtime_average AS (
     SELECT
-        AVG(total_non_operating_days)
-            AS average_non_operating_days
+        AVG(total_non_operating_days) AS average_non_operating_days
     FROM unit_downtime
 )
+
 SELECT
     ud.production_unit,
     ud.weekends_holidays_days,
     ud.planned_shutdown_days,
     ud.unplanned_shutdown_days,
     ud.total_non_operating_days,
-    ROUND(
-        da.average_non_operating_days,
-        2
-    ) AS average_non_operating_days,
-    ROUND(
-        ud.total_non_operating_days
-        - da.average_non_operating_days,
-        2
-    ) AS days_above_average
+    ROUND(da.average_non_operating_days, 2) AS average_non_operating_days,
+    ROUND(ud.total_non_operating_days - da.average_non_operating_days, 2) AS days_above_average
 FROM unit_downtime AS ud
 CROSS JOIN downtime_average AS da
-WHERE
-    ud.total_non_operating_days
-    > da.average_non_operating_days
+WHERE ud.total_non_operating_days > da.average_non_operating_days
 ORDER BY
     days_above_average DESC,
     ud.unplanned_shutdown_days DESC;
@@ -1016,21 +853,17 @@ WITH unit_downtime AS (
         weekends_holidays_days,
         planned_shutdown_days,
         unplanned_shutdown_days,
-        (
-            weekends_holidays_days
-            + planned_shutdown_days
-            + unplanned_shutdown_days
-        ) AS total_non_operating_days
+        weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days AS total_non_operating_days
     FROM manufacturing_capacity
 ),
+
 downtime_distribution AS (
     SELECT
         unit_downtime.*,
-        NTILE(4) OVER (
-            ORDER BY total_non_operating_days
-        ) AS downtime_quartile
+        NTILE(4) OVER (ORDER BY total_non_operating_days) AS downtime_quartile
     FROM unit_downtime
 )
+
 SELECT
     production_unit,
     weekends_holidays_days,
@@ -1070,41 +903,23 @@ ORDER BY
 
 WITH production_requirements AS (
     SELECT
-        SUM(dp.q2_2021_projection)
-            AS total_q2_projected_demand,
-        ROUND(
-            SUM(
-                dp.q2_2021_projection
-                * pct.cycle_time_hours
-            ),
-            2
-        ) AS total_projected_q2_cycle_time_requirement
+        SUM(dp.q2_2021_projection) AS total_q2_projected_demand,
+        ROUND(SUM(dp.q2_2021_projection * pct.cycle_time_hours), 2) AS total_projected_q2_cycle_time_requirement
     FROM demand_projections AS dp
     INNER JOIN product_cycle_time AS pct
         ON dp.product = pct.product
 ),
+
 capacity_exposure AS (
     SELECT
         COUNT(*) AS total_production_units,
-        SUM(
-            weekends_holidays_days
-            + planned_shutdown_days
-            + unplanned_shutdown_days
-        ) AS total_reported_non_operating_days,
-        SUM(planned_shutdown_days)
-            AS total_planned_shutdown_days,
-        SUM(unplanned_shutdown_days)
-            AS total_unplanned_shutdown_days,
-        ROUND(
-            AVG(
-                weekends_holidays_days
-                + planned_shutdown_days
-                + unplanned_shutdown_days
-            ),
-            2
-        ) AS average_non_operating_days_per_unit
+        SUM(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days) AS total_reported_non_operating_days,
+        SUM(planned_shutdown_days) AS total_planned_shutdown_days,
+        SUM(unplanned_shutdown_days) AS total_unplanned_shutdown_days,
+        ROUND(AVG(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days), 2) AS average_non_operating_days_per_unit
     FROM manufacturing_capacity
 )
+
 SELECT
     pr.total_q2_projected_demand,
     pr.total_projected_q2_cycle_time_requirement,
