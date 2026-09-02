@@ -194,33 +194,45 @@ ORDER BY
 
 -- ------------------------------------------------------------
 -- 1.8 Inventory coverage in months
+--
+-- Inventory coverage is calculated using projected average
+-- monthly demand (annual demand / 12).
 -- ------------------------------------------------------------
 
 SELECT
     sku,
     inventory_units_on_hand,
-    average_monthly_usage,
-    ROUND(inventory_units_on_hand / NULLIF(average_monthly_usage, 0), 2) AS months_of_inventory_coverage,
+    ROUND(annual_demand / 12, 2) AS projected_average_monthly_demand,
+    ROUND(inventory_units_on_hand / NULLIF(annual_demand / 12, 0), 2) AS months_of_inventory_coverage,
     ROUND(on_hand_stock_value, 2) AS on_hand_stock_value,
     ROUND(annual_demand, 2) AS annual_demand
 FROM inventory_features
 ORDER BY months_of_inventory_coverage DESC;
 
 -- ------------------------------------------------------------
--- 1.9 SKUs with less than one month of inventory coverage
+-- 1.9 SKUs with Less Than One Month of Inventory Coverage
+--
+-- Inventory coverage is calculated using projected average
+-- monthly demand, defined as annual projected demand / 12.
+--
+-- SKUs with less than one month of projected coverage are
+-- flagged for replenishment review.
+--
+-- The one-month threshold is used as an analytical screening
+-- rule rather than a confirmed company policy.
 -- ------------------------------------------------------------
 
 SELECT
     sku,
     inventory_units_on_hand,
-    average_monthly_usage,
-    ROUND(inventory_units_on_hand / NULLIF(average_monthly_usage, 0), 2) AS months_of_inventory_coverage,
+    ROUND(annual_demand / 12, 2) AS projected_average_monthly_demand,
+    ROUND(inventory_units_on_hand / NULLIF(annual_demand / 12, 0), 2) AS months_of_inventory_coverage,
     ROUND(reorder_point, 2) AS reorder_point,
     lead_time_days,
     ROUND(on_hand_stock_value, 2) AS on_hand_stock_value
 FROM inventory_features
 WHERE
-    inventory_units_on_hand / NULLIF(average_monthly_usage, 0) < 1
+    inventory_units_on_hand / NULLIF(annual_demand / 12, 0) < 1
 ORDER BY months_of_inventory_coverage ASC;
 
 -- ------------------------------------------------------------
@@ -235,6 +247,7 @@ SELECT
     inventory_units_on_hand,
     ROUND(annual_demand, 2) AS annual_demand,
     ROUND(inventory_units_on_hand - annual_demand, 2) AS potential_excess_units,
+    ROUND(100.0 * (inventory_units_on_hand - annual_demand) / NULLIF(annual_demand, 0), 2) AS excess_inventory_percentage,
     standard_price,
     ROUND((inventory_units_on_hand - annual_demand) * standard_price, 2) AS potential_excess_value
 FROM inventory_features
@@ -247,7 +260,9 @@ ORDER BY potential_excess_value DESC;
 
 SELECT
     sku,
+    ROUND(annual_demand, 2) AS annual_demand,
     ROUND(safety_stock, 2) AS safety_stock,
+    ROUND(100.0 * safety_stock / NULLIF(annual_demand, 0), 2) AS safety_stock_percentage_of_annual_demand,
     ROUND(reorder_point, 2) AS reorder_point,
     ROUND(demand_during_lead_time, 2) AS demand_during_lead_time,
     ROUND(demand_variability_cov, 4) AS demand_variability_cov,
@@ -259,25 +274,14 @@ ORDER BY safety_stock DESC
 LIMIT 20;
 
 -- ------------------------------------------------------------
--- 1.12 Relationship between variability, lead time,
--- and safety stock
--- ------------------------------------------------------------
-
-SELECT
-    sku,
-    demand_variability_cov,
-    lead_time_days,
-    ROUND(daily_demand, 2) AS daily_demand,
-    ROUND(safety_stock, 2) AS safety_stock,
-    ROUND(reorder_point, 2) AS reorder_point
-FROM inventory_features
-ORDER BY
-    demand_variability_cov DESC,
-    lead_time_days DESC
-LIMIT 25;
-
--- ------------------------------------------------------------
--- 1.13 Demand-trend distribution
+-- 1.12 Demand Trend Summary
+--
+-- Inventory items are classified as Growing, Stable, or
+-- Declining Demand based on the projected average monthly
+-- usage trend.
+--
+-- The query summarizes the number of SKUs, projected annual
+-- demand, and inventory value within each demand category.
 -- ------------------------------------------------------------
 
 SELECT
@@ -289,20 +293,29 @@ SELECT
         ELSE 'Growing Demand'
     END AS demand_trend_category,
     COUNT(*) AS sku_count,
-    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS percentage_of_skus,
+    ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 2) AS percentage_of_total_skus,
     ROUND(SUM(annual_demand), 2) AS total_annual_demand,
     ROUND(SUM(on_hand_stock_value), 2) AS total_inventory_value
 FROM inventory_features
 GROUP BY demand_trend_category;
 
 -- ------------------------------------------------------------
--- 1.14 Priority inventory exceptions
+-- 1.13 Prioritized Inventory Exceptions
 --
--- Combines reorder-point exposure, low supplier delivery
--- performance, and high demand variability.
+-- Identifies inventory items currently below their
+-- calculated reorder points.
 --
--- These are screening conditions rather than a validated
--- predictive risk model.
+-- Results are prioritized by:
+-- 1. Reorder shortfall (highest first)
+-- 2. Supplier on-time delivery (lowest first)
+-- 3. Demand variability (highest first)
+--
+-- Supplier delivery performance and demand variability are
+-- used as supporting prioritization indicators rather than
+-- hard screening thresholds.
+--
+-- This is an analytical prioritization report rather than a
+-- validated predictive risk model.
 -- ------------------------------------------------------------
 
 SELECT
@@ -316,10 +329,11 @@ SELECT
     ROUND(safety_stock, 2) AS safety_stock,
     ROUND(on_hand_stock_value, 2) AS on_hand_stock_value
 FROM inventory_features
-WHERE inventory_units_on_hand < reorder_point AND supplier_on_time_delivery < 0.80
-ORDER BY 
-	reorder_shortfall DESC,
-	demand_variability_cov DESC;
+WHERE inventory_units_on_hand < reorder_point 
+ORDER BY
+    reorder_shortfall DESC,
+    supplier_on_time_delivery ASC,
+    demand_variability_cov DESC;
 
 -- ============================================================
 -- 2. SUPPLIER RISK ASSESSMENT — MEDICRYSTALS
@@ -331,8 +345,8 @@ ORDER BY
 
 SELECT
     COUNT(*) AS total_suppliers,
-    ROUND(AVG(revenue), 2) AS average_revenue_million_usd,
-    ROUND(AVG(cash_from_operations), 2) AS average_cash_from_operations_million_usd,
+    ROUND(SUM(revenue), 2) AS average_revenue_million_usd,
+    ROUND(SUM(cash_from_operations), 2) AS average_cash_from_operations_million_usd,
     ROUND(AVG(credit_rating), 2) AS average_credit_rating,
     ROUND(AVG(s_otd), 4) AS average_supplier_otd,
     ROUND(AVG(data_security), 2) AS average_data_security_score,
@@ -349,11 +363,8 @@ FROM supplier_risk;
 SELECT
     supplier_name,
     location,
-    s_otd,
-    credit_rating,
-    single_source,
-    labor_unrests,
-    environmental_incidents
+    ROUND(100 * s_otd, 2) AS supplier_otd_percentage,
+    credit_rating
 FROM supplier_risk
 ORDER BY 
 	s_otd ASC, 
@@ -366,17 +377,15 @@ ORDER BY
 SELECT
     supplier_name,
     location,
-    revenue,
-    cash_from_operations,
-    credit_rating,
-    s_otd,
+    single_source,
     ip_protection,
-    data_security,
-    labor_unrests,
-    environmental_incidents
+    data_security
 FROM supplier_risk
-WHERE single_source = 1
-ORDER BY s_otd ASC;
+ORDER BY
+    single_source DESC,
+    ip_protection DESC,
+    data_security DESC,
+    supplier_name ASC;
 
 -- ------------------------------------------------------------
 -- 2.4 Suppliers with operational or regulatory indicators
@@ -385,18 +394,13 @@ ORDER BY s_otd ASC;
 SELECT
     supplier_name,
     location,
-    s_otd,
-    single_source,
     labor_unrests,
-    environmental_incidents,
-    data_security,
-    ip_protection
+    environmental_incidents
 FROM supplier_risk
-WHERE labor_unrests = 1 OR environmental_incidents = 1 OR ip_protection = 0
+WHERE labor_unrests = 1 OR environmental_incidents = 1
 ORDER BY 
-	environmental_incidents DESC, 
-	labor_unrests DESC, 
-	single_source DESC;
+	labor_unrests DESC,
+    environmental_incidents DESC;
 
 -- ------------------------------------------------------------
 -- 2.5 Transparent supplier risk-indicator count
@@ -422,7 +426,7 @@ SELECT
     environmental_incidents,
     single_source + (ip_protection = 0) + labor_unrests + environmental_incidents AS binary_risk_indicator_count
 FROM supplier_risk
-ORDER BY 
+ORDER BY
 	binary_risk_indicator_count DESC, 
     s_otd ASC;
 

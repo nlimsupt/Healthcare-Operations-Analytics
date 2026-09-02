@@ -1,4 +1,4 @@
-supplier_name,location,s_otd,labor_unrests,environmental_incidents
-RealGlass,China,0.82,1,1
-Shale,"Saudi Arabia",0.86,0,1
-Plaxian,US,0.91,1,0
+supplier_name,location,labor_unrests,environmental_incidents
+RealGlass,China,1,1
+Plaxian,US,1,0
+Shale,"Saudi Arabia",0,1
