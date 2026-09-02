@@ -1,6 +1,6 @@
-# **Executive Summary**
+# **Analysis Summary**
 
-## **Inventory Analysis**
+## **1. Inventory Analysis**
 
 The inventory portfolio consists of 2,010 SKUs, representing 4.84 million inventory units with a total inventory value of $46.0 million. Supplier lead times range from 1 to 290 days (average 29.82 days), while supplier on-time delivery performance ranges from 70% to 100% (average 90.23%). The portfolio also exhibits an average demand variability (COV) of 0.8798, indicating that inventory planning should account for uncertainty in future demand. Demand trend analysis further shows that 1,336 SKUs (66.47%) are classified as growing-demand products, representing approximately 70.93 million units of projected annual demand and $35.56 million in inventory value, while the remaining 674 SKUs (33.53%) are classified as declining-demand products, representing approximately 7.62 million units of projected annual demand and $10.44 million in inventory value.
 
@@ -14,7 +14,7 @@ Inventory coverage varies substantially across the portfolio. Thirty-two SKUs ha
 
 Safety stock analysis shows that the highest safety stock requirement is 375,478 units, representing 11.22% of the product's projected annual demand. Across the top 20 inventory items, safety stock requirements range from approximately 16,000 to 375,000 units. No single planning variable consistently explains the highest safety stock requirements, indicating that buffer inventory is determined by the combined effects of projected demand, demand variability, and replenishment characteristics.
 
-## **Supplier Risk Assessment**
+## **2. Supplier Risk Assessment**
 
 The supplier portfolio consists of 12 suppliers generating approximately $74.34 billion in total revenue and $6.78 billion in cash from operations. Average supplier on-time delivery performance is 84.67%, with an average credit rating of 2.92 and an average data security score of 8.0. Half of the suppliers (6 suppliers, 50.00%) are single-source suppliers, while 8 suppliers (66.67%) operate without IP protection. Additionally, 2 suppliers (16.67%) have reported labor unrest, and 2 suppliers (16.67%) have experienced environmental incidents. These portfolio-level characteristics establish the baseline for subsequent supplier risk assessment.
 
@@ -30,7 +30,7 @@ Operating cash flow margins range from 0.45% to 100%, although 11 of the 12 supp
 
 The supplier risk matrix consolidates delivery, financial, data management, and regulatory indicators into a single analytical view. RealGlass exhibits multiple risk indicators across financial, data management, and regulatory dimensions. BestOGlass also demonstrates multiple risk indicators, primarily driven by weak delivery performance and data management characteristics. These results illustrate that supplier risk is multidimensional, with different suppliers exhibiting different combinations of risk indicators rather than a single dominant risk factor.
 
-## **Production Planning and Manufacturing Capacity**
+## **3. Production Planning and Manufacturing Capacity**
 
 The production portfolio consists of three product lines: Ampoules, Syringes, and Vials. Projected demand increases continuously across all planning periods for every product, indicating sustained growth in production requirements. Among the three products, Ampoules consistently exhibit the highest projected demand in every planning period, followed by Syringes and Vials. Vials require the longest overall production cycle (63 hours), while Syringes have the shortest cycle time (57 hours). Although Vials require the longest production cycle per unit, Ampoules are expected to require the greatest production capacity based on the Q2 2021 demand projection, totaling approximately 3,900 production hours, followed by Syringes (2,565 hours) and Vials (2,205 hours). Across all three product lines, packing is the most time-consuming production process, requiring 24 hours for each product. In terms of quality performance, contamination represents the highest reported reject rate for all three products, ranging from 5.2% to 6.0%, making contamination the most frequently observed defect category across all three product lines.
 
