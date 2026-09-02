@@ -770,26 +770,7 @@ ORDER BY
     unplanned_shutdown_days DESC;
 
 -- ------------------------------------------------------------
--- 3.11 Production units with highest unplanned downtime
---
--- The percentage represents unplanned shutdown days as a
--- share of the unit's reported non-operating days.
--- It does not represent overall capacity utilization.
--- ------------------------------------------------------------
-
-SELECT
-    production_unit,
-    unplanned_shutdown_days,
-    planned_shutdown_days,
-    weekends_holidays_days,
-    ROUND(100.0 * unplanned_shutdown_days / NULLIF(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days, 0), 2) AS unplanned_share_of_non_operating_days
-FROM manufacturing_capacity
-ORDER BY
-    unplanned_shutdown_days DESC,
-    unplanned_share_of_non_operating_days DESC;
-
--- ------------------------------------------------------------
--- 3.12 Downtime composition by production unit
+-- 3.11 Downtime composition by production unit
 -- ------------------------------------------------------------
 
 SELECT
@@ -802,7 +783,7 @@ FROM manufacturing_capacity
 ORDER BY total_non_operating_days DESC;
 
 -- ------------------------------------------------------------
--- 3.13 Production units above average downtime
+-- 3.12 Production units above average downtime
 --
 -- This query identifies units whose total non-operating days
 -- exceed the average across all production units.
@@ -838,99 +819,3 @@ WHERE ud.total_non_operating_days > da.average_non_operating_days
 ORDER BY
     days_above_average DESC,
     ud.unplanned_shutdown_days DESC;
-
--- ------------------------------------------------------------
--- 3.14 Relative downtime priority classification
---
--- Priority is based on the production-unit distribution:
--- - High Priority: total downtime at or above the upper quartile
--- - Moderate Priority: between the median and upper quartile
--- - Standard Monitoring: below the median
---
--- This is a relative screening classification, not a validated
--- capacity-risk model.
--- ------------------------------------------------------------
-
-WITH unit_downtime AS (
-    SELECT
-        production_unit,
-        weekends_holidays_days,
-        planned_shutdown_days,
-        unplanned_shutdown_days,
-        weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days AS total_non_operating_days
-    FROM manufacturing_capacity
-),
-
-downtime_distribution AS (
-    SELECT
-        unit_downtime.*,
-        NTILE(4) OVER (ORDER BY total_non_operating_days) AS downtime_quartile
-    FROM unit_downtime
-)
-
-SELECT
-    production_unit,
-    weekends_holidays_days,
-    planned_shutdown_days,
-    unplanned_shutdown_days,
-    total_non_operating_days,
-    downtime_quartile,
-    CASE
-        WHEN downtime_quartile = 4
-            THEN 'High Priority'
-        WHEN downtime_quartile = 3
-            THEN 'Moderate Priority'
-        ELSE 'Standard Monitoring'
-    END AS downtime_priority
-FROM downtime_distribution
-ORDER BY
-    downtime_quartile DESC,
-    total_non_operating_days DESC,
-    unplanned_shutdown_days DESC;
-
--- ------------------------------------------------------------
--- 3.15 Production-capacity decision-support summary
---
--- This query places production requirements and reported
--- downtime indicators in one management summary.
---
--- The metrics must not be directly compared as equivalent
--- measures. Demand is reported in units, cycle-time workload
--- depends on the source cycle-time basis, and downtime is
--- reported in days.
---
--- Because product-to-production-unit mappings, operating hours,
--- production rates, and planning-period capacity are unavailable,
--- this query does not calculate capacity utilization or confirm
--- whether projected demand can be fulfilled.
--- ------------------------------------------------------------
-
-WITH production_requirements AS (
-    SELECT
-        SUM(dp.q2_2021_projection) AS total_q2_projected_demand,
-        ROUND(SUM(dp.q2_2021_projection * pct.cycle_time_hours), 2) AS total_projected_q2_cycle_time_requirement
-    FROM demand_projections AS dp
-    INNER JOIN product_cycle_time AS pct
-        ON dp.product = pct.product
-),
-
-capacity_exposure AS (
-    SELECT
-        COUNT(*) AS total_production_units,
-        SUM(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days) AS total_reported_non_operating_days,
-        SUM(planned_shutdown_days) AS total_planned_shutdown_days,
-        SUM(unplanned_shutdown_days) AS total_unplanned_shutdown_days,
-        ROUND(AVG(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days), 2) AS average_non_operating_days_per_unit
-    FROM manufacturing_capacity
-)
-
-SELECT
-    pr.total_q2_projected_demand,
-    pr.total_projected_q2_cycle_time_requirement,
-    ce.total_production_units,
-    ce.total_reported_non_operating_days,
-    ce.total_planned_shutdown_days,
-    ce.total_unplanned_shutdown_days,
-    ce.average_non_operating_days_per_unit
-FROM production_requirements AS pr
-CROSS JOIN capacity_exposure AS ce;
