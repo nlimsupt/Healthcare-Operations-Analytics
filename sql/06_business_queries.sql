@@ -236,7 +236,53 @@ WHERE
 ORDER BY months_of_inventory_coverage ASC;
 
 -- ------------------------------------------------------------
--- 1.10 Potential excess inventory
+-- 1.10 One-month inventory coverage shortfall exposure
+--
+-- Identifies SKUs with less than one month of projected
+-- inventory coverage and estimates the number of additional
+-- units and inventory value required to reach one month
+-- of projected average demand.
+--
+-- The estimated value is based on standard price and should
+-- not be interpreted as lost revenue or an actual purchase
+-- order requirement.
+-- ------------------------------------------------------------
+
+WITH shortfall_exposure AS (
+    SELECT
+        sku,
+        inventory_units_on_hand,
+        annual_demand / 12 AS projected_average_monthly_demand,
+        annual_demand / 12 - inventory_units_on_hand AS inventory_shortfall_units,
+        standard_price,
+        (annual_demand / 12 - inventory_units_on_hand) * standard_price
+            AS estimated_shortfall_inventory_value
+    FROM inventory_features
+    WHERE
+        inventory_units_on_hand / NULLIF(annual_demand / 12, 0) < 1
+)
+
+SELECT
+    sku,
+    inventory_units_on_hand,
+    ROUND(projected_average_monthly_demand, 2)
+        AS projected_average_monthly_demand,
+    ROUND(inventory_shortfall_units, 2)
+        AS inventory_shortfall_units,
+    standard_price,
+    ROUND(estimated_shortfall_inventory_value, 2)
+        AS estimated_shortfall_inventory_value,
+    ROUND(
+        100.0 * estimated_shortfall_inventory_value
+        / SUM(estimated_shortfall_inventory_value) OVER (),
+        2
+    ) AS percentage_of_total_shortfall_exposure
+FROM shortfall_exposure
+ORDER BY
+    estimated_shortfall_inventory_value DESC; 
+
+-- ------------------------------------------------------------
+-- 1.11 Potential excess inventory
 --
 -- This query treats inventory exceeding annual demand as
 -- potential excess inventory for screening purposes.
@@ -255,7 +301,7 @@ WHERE inventory_units_on_hand > annual_demand
 ORDER BY potential_excess_value DESC;
 
 -- ------------------------------------------------------------
--- 1.11 Highest safety-stock requirements
+-- 1.12 Highest safety-stock requirements
 -- ------------------------------------------------------------
 
 SELECT
@@ -274,7 +320,7 @@ ORDER BY safety_stock DESC
 LIMIT 20;
 
 -- ------------------------------------------------------------
--- 1.12 Demand Trend Summary
+-- 1.13 Demand Trend Summary
 --
 -- Inventory items are classified as Growing, Stable, or
 -- Declining Demand based on the projected average monthly
@@ -300,7 +346,7 @@ FROM inventory_features
 GROUP BY demand_trend_category;
 
 -- ------------------------------------------------------------
--- 1.13 Prioritized Inventory Exceptions
+-- 1.14 Prioritized Inventory Exceptions
 --
 -- Identifies inventory items currently below their
 -- calculated reorder points.
