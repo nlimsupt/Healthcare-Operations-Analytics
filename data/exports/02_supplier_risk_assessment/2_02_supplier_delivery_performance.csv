@@ -1,13 +1,13 @@
-supplier_name,location,supplier_otd_percentage,credit_rating
-Boavidro,Brazil,63.00,3
-BestOGlass,US,78.00,2
-PharmyLeaf,India,79.00,2
-RealGlass,China,82.00,1
-GutesGlas,Germany,85.00,3
-Shale,"Saudi Arabia",86.00,3
-basicPharm,US,88.00,5
-Optikiet,China,88.00,4
-Saanch,India,90.00,2
-Plaxian,US,91.00,3
-Opticful,Italy,92.00,3
-MedicMetric,Philippines,94.00,4
+supplier_name,location,s_otd,supplier_otd_percentage
+Boavidro,Brazil,0.63,63.00
+BestOGlass,US,0.78,78.00
+PharmyLeaf,India,0.79,79.00
+RealGlass,China,0.82,82.00
+GutesGlas,Germany,0.85,85.00
+Shale,"Saudi Arabia",0.86,86.00
+basicPharm,US,0.88,88.00
+Optikiet,China,0.88,88.00
+Saanch,India,0.90,90.00
+Plaxian,US,0.91,91.00
+Opticful,Italy,0.92,92.00
+MedicMetric,Philippines,0.94,94.00

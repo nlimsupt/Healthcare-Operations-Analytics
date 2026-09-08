@@ -252,13 +252,13 @@ WITH shortfall_exposure AS (
     SELECT
         sku,
         inventory_units_on_hand,
-        annual_demand / 12 AS projected_average_monthly_demand,
-        annual_demand / 12 - inventory_units_on_hand AS inventory_shortfall_units,
+        annual_demand / 12.0 AS projected_average_monthly_demand,
+        (annual_demand / 12.0) - inventory_units_on_hand AS inventory_shortfall_units,
         standard_price,
-        (annual_demand / 12 - inventory_units_on_hand) * standard_price AS estimated_shortfall_inventory_value
+        ((annual_demand / 12.0) - inventory_units_on_hand) * standard_price AS estimated_shortfall_inventory_value
     FROM inventory_features
     WHERE
-        inventory_units_on_hand / NULLIF(annual_demand / 12, 0) < 1
+        inventory_units_on_hand / NULLIF(annual_demand / 12.0, 0) < 1
 )
 
 SELECT
@@ -268,10 +268,11 @@ SELECT
     ROUND(inventory_shortfall_units, 2) AS inventory_shortfall_units,
     standard_price,
     ROUND(estimated_shortfall_inventory_value, 2) AS estimated_shortfall_inventory_value,
+	ROUND(SUM(estimated_shortfall_inventory_value) OVER (), 2) AS total_shortfall_inventory_value,
     ROUND(100.0 * estimated_shortfall_inventory_value / SUM(estimated_shortfall_inventory_value) OVER (), 2) AS percentage_of_total_shortfall_exposure
 FROM shortfall_exposure
 ORDER BY
-    estimated_shortfall_inventory_value DESC; 
+    estimated_shortfall_inventory_value DESC;
 
 -- ------------------------------------------------------------
 -- 1.11 Potential excess inventory
@@ -401,12 +402,11 @@ FROM supplier_risk;
 SELECT
     supplier_name,
     location,
-    ROUND(100 * s_otd, 2) AS supplier_otd_percentage,
-    credit_rating
+    s_otd,
+    ROUND(100 * s_otd, 2) AS supplier_otd_percentage
 FROM supplier_risk
 ORDER BY 
-	s_otd ASC, 
-	single_source DESC;
+	s_otd ASC;
 
 -- ------------------------------------------------------------
 -- 2.3 Single-source supplier exposure
@@ -455,9 +455,6 @@ ORDER BY
 SELECT
     supplier_name,
     location,
-    s_otd,
-    credit_rating,
-    data_security,
     single_source,
     ip_protection,
     labor_unrests,
@@ -465,8 +462,7 @@ SELECT
     single_source + (ip_protection = 0) + labor_unrests + environmental_incidents AS binary_risk_indicator_count
 FROM supplier_risk
 ORDER BY
-	binary_risk_indicator_count DESC, 
-    s_otd ASC;
+	binary_risk_indicator_count DESC;
 
 -- ------------------------------------------------------------
 -- 2.6 Supplier financial profile
@@ -484,83 +480,51 @@ FROM supplier_risk
 ORDER BY operating_cash_flow_margin ASC;
 
 -- ------------------------------------------------------------
--- 2.7 Comprehensive supplier-risk profile
+-- 2.7 Supplier quantitative performance profile
 --
--- This query presents supplier-risk indicators across four
--- dimensions: financial, operations, data management,
--- and regulatory risk.
+-- This query summarizes supplier performance across three
+-- quantitative dimensions: credit quality, delivery
+-- performance, and data security.
 --
--- Numeric indicators are converted to transparent 0–100
--- risk-oriented scores where appropriate:
--- - Higher score = higher risk
--- - No weighted overall risk score is created
+-- All numeric indicators are normalized to a transparent
+-- 0–100 performance scale:
+-- - Higher score = better performance
+-- - Lower score = weaker performance
 --
--- Revenue and cash from operations are retained as financial
--- context rather than converted into risk scores.
---
--- Regulatory risk is reported as an indicator count because
--- only two binary indicators are available.
+-- An equally weighted overall performance score is calculated
+-- as a descriptive summary of the three quantitative
+-- dimensions. It is intended for comparison purposes only
+-- and should not be interpreted as a validated supplier
+-- evaluation model.
+-- 
+-- Composite score is calculated from credit, delivery, and data security performance only.
 -- ------------------------------------------------------------
+
+WITH supplier_performance AS (
+    SELECT
+        supplier_name,
+        location,
+        credit_rating,
+        s_otd,
+        data_security,
+        (credit_rating - 1) * 25 AS credit_performance_score,
+        s_otd * 100 AS delivery_performance_score,
+        data_security * 10 AS data_security_performance_score
+    FROM supplier_risk
+)
 
 SELECT
     supplier_name,
     location,
-    -- ========================================================
-    -- Financial Risk
-    -- ========================================================
-    revenue,
-    cash_from_operations,
     credit_rating,
-    -- Credit rating ranges from 1 to 5.
-    -- Lower credit rating = higher financial risk.
-    ROUND((6 - credit_rating) / 5.0 * 100, 2) AS credit_rating_risk_score,
-    -- ========================================================
-    -- Operations Risk
-    -- ========================================================
     s_otd,
-    -- S-OTD is stored as a ratio from 0 to 1.
-    -- The score represents the percentage delivery shortfall.
-    -- Example: S-OTD = 0.82 produces an 18% shortfall score.
-    ROUND((1 - s_otd) * 100, 2) AS delivery_shortfall_score,
-    -- ========================================================
-    -- Data Management Risk
-    -- ========================================================
-    single_source,
-    ip_protection,
     data_security,
-    -- Binary risk indicators:
-    -- Single source = 1 means sourcing dependency is present.
-    single_source AS single_source_risk_indicator,
-    -- IP protection = 0 is treated as a risk indicator.
-    CASE
-        WHEN ip_protection = 0 THEN 1
-        ELSE 0
-    END AS no_ip_protection_risk_indicator,
-    -- Data-security score ranges from 0 to 10.
-    -- Lower data-security score = higher risk.
-    ROUND((10 - data_security) / 10.0 * 100, 2) AS data_security_gap_score,
-    -- Count of binary data-management risk indicators.
-    (single_source 
-	    + CASE 
-			WHEN ip_protection = 0 THEN 1 
-            ELSE 0 
-		END) AS data_management_binary_risk_count,
-    -- ========================================================
-    -- Regulatory Risk
-    -- ========================================================
-    labor_unrests,
-    environmental_incidents,
-    -- Count of regulatory risk indicators:
-    -- 0 = no indicators present
-    -- 1 = one indicator present
-    -- 2 = both indicators present
-    (labor_unrests + environmental_incidents) AS regulatory_risk_indicator_count
-FROM supplier_risk
-ORDER BY
-    credit_rating_risk_score DESC,
-    delivery_shortfall_score DESC,
-    data_security_gap_score DESC,
-    regulatory_risk_indicator_count DESC;
+    credit_performance_score,
+    delivery_performance_score,
+    data_security_performance_score,
+    ROUND((credit_performance_score + delivery_performance_score + data_security_performance_score) / 3, 2) AS composite_performance_score
+FROM supplier_performance
+ORDER BY composite_performance_score ASC;
 
 -- ============================================================
 -- 3. PRODUCTION CAPACITY ANALYSIS — FABRICADAS PLANT
@@ -631,7 +595,7 @@ SELECT
 FROM demand_projections;
 
 -- ------------------------------------------------------------
--- 3.4 Process-cycle-time bottleneck by product
+-- 3.4 Product Cycle Time Profile
 -- ------------------------------------------------------------
 
 SELECT
@@ -640,6 +604,7 @@ SELECT
     hot_forming_hours,
     washing_hours,
     packing_hours,
+    tubing_hours + hot_forming_hours + washing_hours + packing_hours AS summed_process_cycle_time_hours,
     GREATEST(
         tubing_hours,
         hot_forming_hours,
@@ -673,27 +638,10 @@ SELECT
         ) THEN 'Packing'
     END AS potential_bottleneck_process
 FROM process_cycle_time
-ORDER BY longest_process_time_hours DESC;
+ORDER BY summed_process_cycle_time_hours DESC;
 
 -- ------------------------------------------------------------
--- 3.5 Product cycle-time reconciliation
---
--- Compares the reported total product cycle time with the
--- sum of the four listed process cycle times.
--- ------------------------------------------------------------
-
-SELECT
-    pct.product,
-    pct.cycle_time_hours AS reported_cycle_time_hours,
-    prct.tubing_hours + prct.hot_forming_hours + prct.washing_hours + prct.packing_hours AS summed_process_cycle_time_hours,
-    ROUND(pct.cycle_time_hours - (prct.tubing_hours + prct.hot_forming_hours + prct.washing_hours + prct.packing_hours), 4) AS cycle_time_difference_hours
-FROM product_cycle_time AS pct
-INNER JOIN process_cycle_time AS prct
-    ON pct.product = prct.product
-ORDER BY ABS(cycle_time_difference_hours) DESC;
-
--- ------------------------------------------------------------
--- 3.6 Largest reported reject category by product
+-- 3.5 Largest reported reject category by product
 -- ------------------------------------------------------------
 
 SELECT
@@ -702,6 +650,7 @@ SELECT
     contamination_reject_rate,
     glass_breakage_reject_rate,
     air_bubble_reject_rate,
+    ROUND(bend_tubing_reject_rate + contamination_reject_rate + glass_breakage_reject_rate + air_bubble_reject_rate, 4) AS summed_reported_defect_rates,
     GREATEST(
         bend_tubing_reject_rate,
         contamination_reject_rate,
@@ -738,25 +687,7 @@ FROM product_rejects
 ORDER BY highest_reject_rate DESC;
 
 -- ------------------------------------------------------------
--- 3.7 Reported reject-rate profile
---
--- The sum is used only as a descriptive indicator because the
--- source does not confirm whether defect categories overlap.
---
--- The average represents the mean reported defect rate across
--- the four defect categories and should not be interpreted as
--- the overall product reject rate.
--- ------------------------------------------------------------
-
-SELECT
-    product,
-    ROUND(bend_tubing_reject_rate + contamination_reject_rate + glass_breakage_reject_rate + air_bubble_reject_rate, 4) AS summed_reported_defect_rates,
-    ROUND((bend_tubing_reject_rate + contamination_reject_rate + glass_breakage_reject_rate + air_bubble_reject_rate) / 4, 4) AS average_reported_defect_rate
-FROM product_rejects
-ORDER BY summed_reported_defect_rates DESC;
-
--- ------------------------------------------------------------
--- 3.8 Approximate cycle-time requirement for Q2 demand
+-- 3.7 Approximate cycle-time requirement for Q2 demand
 --
 -- This multiplication is an analytical workload indicator.
 -- Its operational interpretation depends on whether cycle time
@@ -778,22 +709,7 @@ ORDER BY projected_q2_cycle_time_requirement DESC;
 -- ------------------------------------------------------------
 
 -- ------------------------------------------------------------
--- 3.9 Manufacturing downtime overview
--- ------------------------------------------------------------
-
-SELECT
-    COUNT(*) AS total_production_units,
-    SUM(weekends_holidays_days)
-        AS total_weekends_holidays_days,
-    SUM(planned_shutdown_days)
-        AS total_planned_shutdown_days,
-    SUM(unplanned_shutdown_days)
-        AS total_unplanned_shutdown_days,
-    SUM(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days) AS total_non_operating_days
-FROM manufacturing_capacity;
-
--- ------------------------------------------------------------
--- 3.10 Total downtime by production unit
+-- 3.8 Total downtime by production unit
 -- ------------------------------------------------------------
 
 SELECT
@@ -808,52 +724,17 @@ ORDER BY
     unplanned_shutdown_days DESC;
 
 -- ------------------------------------------------------------
--- 3.11 Downtime composition by production unit
+-- 3.9 Manufacturing downtime summary
 -- ------------------------------------------------------------
 
 SELECT
-    production_unit,
-    weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days AS total_non_operating_days,
-    ROUND(100.0 * weekends_holidays_days / NULLIF(weekends_holidays_days+ planned_shutdown_days + unplanned_shutdown_days, 0), 2) AS weekends_holidays_percentage,
-    ROUND(100.0 * planned_shutdown_days / NULLIF(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days, 0), 2) AS planned_shutdown_percentage,
-    ROUND(100.0 * unplanned_shutdown_days / NULLIF(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days, 0), 2) AS unplanned_shutdown_percentage
-FROM manufacturing_capacity
-ORDER BY total_non_operating_days DESC;
+    COUNT(*) AS total_production_units,
+    SUM(weekends_holidays_days)
+        AS total_weekends_holidays_days,
+    SUM(planned_shutdown_days)
+        AS total_planned_shutdown_days,
+    SUM(unplanned_shutdown_days)
+        AS total_unplanned_shutdown_days,
+    SUM(weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days) AS total_non_operating_days
+FROM manufacturing_capacity;
 
--- ------------------------------------------------------------
--- 3.12 Production units above average downtime
---
--- This query identifies units whose total non-operating days
--- exceed the average across all production units.
--- ------------------------------------------------------------
-
-WITH unit_downtime AS (
-    SELECT
-        production_unit,
-        weekends_holidays_days,
-        planned_shutdown_days,
-        unplanned_shutdown_days,
-        weekends_holidays_days + planned_shutdown_days + unplanned_shutdown_days AS total_non_operating_days
-    FROM manufacturing_capacity
-),
-
-downtime_average AS (
-    SELECT
-        AVG(total_non_operating_days) AS average_non_operating_days
-    FROM unit_downtime
-)
-
-SELECT
-    ud.production_unit,
-    ud.weekends_holidays_days,
-    ud.planned_shutdown_days,
-    ud.unplanned_shutdown_days,
-    ud.total_non_operating_days,
-    ROUND(da.average_non_operating_days, 2) AS average_non_operating_days,
-    ROUND(ud.total_non_operating_days - da.average_non_operating_days, 2) AS days_above_average
-FROM unit_downtime AS ud
-CROSS JOIN downtime_average AS da
-WHERE ud.total_non_operating_days > da.average_non_operating_days
-ORDER BY
-    days_above_average DESC,
-    ud.unplanned_shutdown_days DESC;

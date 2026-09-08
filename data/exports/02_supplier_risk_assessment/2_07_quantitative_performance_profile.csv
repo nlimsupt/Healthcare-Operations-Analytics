@@ -1,0 +1,13 @@
+supplier_name,location,credit_rating,s_otd,data_security,credit_performance_score,delivery_performance_score,data_security_performance_score,composite_performance_score
+RealGlass,China,1,0.82,10,0,82.00,100,60.67
+PharmyLeaf,India,2,0.79,8,25,79.00,80,61.33
+Opticful,Italy,3,0.92,5,50,92.00,50,64.00
+Boavidro,Brazil,3,0.63,8,50,63.00,80,64.33
+BestOGlass,US,2,0.78,10,25,78.00,100,67.67
+Saanch,India,2,0.90,9,25,90.00,90,68.33
+GutesGlas,Germany,3,0.85,8,50,85.00,80,71.67
+Shale,"Saudi Arabia",3,0.86,8,50,86.00,80,72.00
+Plaxian,US,3,0.91,9,50,91.00,90,77.00
+Optikiet,China,4,0.88,7,75,88.00,70,77.67
+MedicMetric,Philippines,4,0.94,7,75,94.00,70,79.67
+basicPharm,US,5,0.88,7,100,88.00,70,86.00
