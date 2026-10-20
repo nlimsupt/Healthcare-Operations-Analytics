@@ -95,9 +95,9 @@ Scenario analysis is used to evaluate how changes in assumptions such as demand,
 
 ## 9. Dashboard Development
 
-Interactive Power BI dashboards are developed to communicate operational KPIs and analytical findings. The dashboard structure includes an executive overview for MediCrystals, supplier-risk analysis, GlasWork inventory decision support, and Fabricadas production and capacity analysis.
+Interactive Power BI dashboards will be developed in a future phase to communicate operational KPIs and analytical findings. The planned dashboard structure will include an executive overview for MediCrystals, supplier-risk analysis, GlasWork inventory decision support, and Fabricadas production and capacity analysis.
 
-The dashboards are designed to support prioritization and decision-making without implying unsupported record-level relationships between operational modules.
+The dashboards will be designed to support prioritization and decision-making without implying unsupported record-level relationships between operational modules.
 
 ---
 
