@@ -4,6 +4,8 @@
 
 This project follows an end-to-end analytics workflow to transform fragmented operational data into actionable business insights for MediCrystals, Co. The methodology covers supplier risk at the company level, inventory planning at GlasWork Plant, and production and manufacturing-capacity analysis at Fabricadas Plant.
 
+The current phase focuses on data preparation, database development, feature engineering, SQL analysis, and business insights. Python-based exploratory and scenario analysis and Power BI dashboards are planned for future development.
+
 ---
 
 ## Project Workflow
@@ -17,8 +19,8 @@ The project consists of the following stages:
 5. Data Validation
 6. Feature Engineering
 7. SQL Analysis
-8. Exploratory and Scenario Analysis
-9. Dashboard Development
+8. Exploratory and Scenario Analysis (Future Phase)
+9. Dashboard Development (Future Phase)
 10. Business Recommendations
 
 ---
@@ -61,7 +63,7 @@ Additional checks are performed for inventory quantities, demand values, percent
 
 ## 6. Feature Engineering
 
-Additional analytical variables are created to support inventory planning and operational analysis. The calculation logic is documented and implemented through reproducible SQL and Python workflows, depending on the analytical requirement.
+Additional analytical variables are created to support inventory planning and operational analysis. The calculation logic is documented and implemented through SQL to support reproducible analysis.
 
 The derived inventory variables are based on inventory-management formulas introduced in the original coursework and are not part of the source datasets.
 
@@ -85,15 +87,15 @@ Because the source exhibits do not provide complete relational mappings across a
 
 ---
 
-## 8. Exploratory and Scenario Analysis
+## 8. Exploratory and Scenario Analysis (Future Phase)
 
-Python is used to conduct deeper exploratory analysis and evaluate operational scenarios. The analysis examines patterns in supplier performance, inventory exposure, production requirements, quality losses, downtime, and capacity availability.
+Python-based exploratory and scenario analysis is planned for a future phase to extend the existing SQL analysis. The analysis will examine patterns in supplier performance, inventory exposure, production requirements, quality losses, downtime, and capacity availability.
 
-Scenario analysis is used to evaluate how changes in assumptions such as demand, lead time, service level, supplier performance, or available capacity may affect inventory and operational requirements. These scenarios are intended to support sensitivity analysis and decision-making rather than validated predictive forecasting.
+Scenario analysis will evaluate how changes in assumptions such as demand, lead time, service level, supplier performance, or available capacity may affect inventory and operational requirements. These scenarios will support sensitivity analysis and decision-making rather than validated predictive forecasting.
 
 ---
 
-## 9. Dashboard Development
+## 9. Dashboard Development (Future Phase)
 
 Interactive Power BI dashboards will be developed in a future phase to communicate operational KPIs and analytical findings. The planned dashboard structure will include an executive overview for MediCrystals, supplier-risk analysis, GlasWork inventory decision support, and Fabricadas production and capacity analysis.
 
@@ -103,22 +105,24 @@ The dashboards will be designed to support prioritization and decision-making wi
 
 ## 10. Business Recommendations
 
-The final stage translates analytical findings into practical business recommendations. Insights from SQL analysis, exploratory analysis, scenario analysis, and dashboards are combined to support operational improvements and management decision-making.
+Findings from SQL analysis are translated into practical business insights and recommendations to support operational improvements and management decision-making. The analysis highlights inventory replenishment priorities, supplier risk exposure, and potential production and capacity constraints.
+
+Future exploratory analysis, scenario analysis, and dashboards may further support and communicate these recommendations.
 
 ---
 
 ## Tools and Techniques by Project Component
 
 | Project Component | Objective | Primary Tools / Techniques |
-|---------------|-----------|----------------------------|
+|---|---|---|
 | Business Understanding | Define business problems, operational scopes, objectives, and analytical questions | Business analysis |
 | Data Understanding | Review source-table structures, granularity, variables, and relationships | Excel, business domain knowledge |
 | Data Preparation | Standardize source tables and prepare analysis-ready CSV files | Excel, data cleaning |
 | Database Design and Loading | Define schemas, keys, data types, and load seven source tables | MySQL |
 | Data Validation | Verify completeness, uniqueness, ranges, formats, and source-to-database consistency | SQL, Excel |
-| Feature Engineering | Create documented inventory and operational metrics | SQL, Python, inventory-management formulas |
+| Feature Engineering | Create documented inventory and operational metrics | SQL, inventory-management formulas |
 | SQL Analysis | Retrieve, aggregate, and summarize operational performance and risk | MySQL |
-| Exploratory and Scenario Analysis | Examine patterns and test operational assumptions | Python, Pandas, Matplotlib, descriptive statistics |
-| Dashboard Development | Present management KPIs and operational insights | Power BI |
+| Exploratory and Scenario Analysis (Future Phase) | Examine patterns and test operational assumptions | Python, pandas, Matplotlib, descriptive statistics |
+| Dashboard Development (Future Phase) | Present management KPIs and operational insights | Power BI |
 | Business Recommendations | Translate findings into prioritized operational actions | Business analysis, data storytelling |
 | Documentation | Record assumptions, datasets, calculations, limitations, and analytical decisions | Markdown, GitHub |
