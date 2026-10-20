@@ -44,7 +44,9 @@ The absence of a structured analytics and reporting process may lead to reactive
 
 The objective of this project is to develop an operational analytics solution that transforms fragmented operational data into actionable decision support for MediCrystals management.
 
-The solution will combine data preparation, business-oriented feature engineering, SQL analysis, Python-based exploratory analysis, scenario analysis, and Power BI dashboards to help management monitor and prioritize supplier risk at the company level, inventory performance at GlasWork Plant, and production and capacity constraints at Fabricadas Plant.
+The current phase focuses on data preparation, business-oriented feature engineering, and SQL analysis to evaluate supplier risk at the company level, inventory performance at GlasWork Plant, and production and capacity conditions at Fabricadas Plant.
+
+Future development will extend the analysis through Python-based exploratory and scenario analysis and interactive Power BI dashboards.
 
 ---
 
@@ -58,7 +60,10 @@ The project aims to:
 4. Assess supplier risk across financial, operational, data-management, and regulatory dimensions.
 5. Compare projected demand with available production capacity at Fabricadas Plant.
 6. Identify products, production processes, or production units that may require operational attention.
-7. Evaluate how changes in demand, lead time, service level, or capacity may affect operational requirements.
+
+Future development objectives include:
+
+7. Evaluate how changes in demand, lead time, service level, or capacity may affect operational requirements through scenario analysis.
 8. Present the results through clear and interactive management dashboards.
 
 ---
@@ -83,7 +88,7 @@ Production and operations managers at Fabricadas Plant need to compare demand re
 
 ### Business Intelligence and Analytics Team
 
-The business intelligence and analytics team is responsible for preparing the data, defining analytical metrics, performing the analysis, and developing decision-support dashboards.
+The business intelligence and analytics team is responsible for preparing the data, defining analytical metrics, and performing SQL-based analysis to support operational decision-making. Future development will extend these capabilities through exploratory analysis, scenario modeling, and interactive dashboards.
 
 ---
 
@@ -168,25 +173,33 @@ The datasets are instructional datasets designed for educational analysis rather
 
 In particular, the available case data does not directly map individual suppliers to specific SKUs. Supplier and inventory risks will therefore be analyzed as separate modules and will not be presented as record-level causal relationships. This design choice reflects the structure of the available case data rather than an analytical assumption. The production and manufacturing-capacity datasets share a common operational context at Fabricadas Plant, but they do not provide a complete transactional mapping between individual products and specific production units.
 
-The inventory data represents a case-based operational snapshot with monthly demand values rather than a long historical transaction series. The project will therefore emphasize inventory planning and scenario analysis rather than claiming to perform a fully validated time-series forecast.
+The inventory data represents a case-based operational snapshot with monthly demand values rather than a long historical transaction series. The current analysis therefore emphasizes inventory planning, descriptive analysis, and operational risk assessment rather than claiming to perform a fully validated time-series forecast. Scenario analysis may be incorporated in a future phase.
 
-All derived metrics, assumptions, and analytical limitations will be documented clearly throughout the project.
+All derived metrics, assumptions, and analytical limitations are documented throughout the project.
 
 ---
 
 ## Expected Deliverables
 
-The project will produce:
+### Current Phase — SQL Analytics
+
+The current phase includes:
 
 - documented source and processed datasets;
 - a comprehensive data dictionary;
 - reproducible data validation, preparation, and feature engineering workflows;
-- SQL scripts for data preparation and business analysis;
-- Python notebooks for exploratory data analysis and scenario analysis;
-- interactive Power BI dashboards for decision support;
+- SQL scripts for database development and business analysis;
+- exported SQL analysis results;
 - key analytical findings and business insights;
-- prioritized business recommendations; and
-- complete documentation of the end-to-end analytics workflow.
+- operational recommendations based on analytical findings; and
+- documentation of the SQL analytics workflow.
+
+### Future Development
+
+Planned enhancements include:
+
+- Python notebooks for exploratory data analysis and scenario analysis; and
+- interactive Power BI dashboards for operational decision support.
 
 ---
 
